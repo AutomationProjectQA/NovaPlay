@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "sectors": [
+    {
+      "id": 1,
+      "name": "Embers",
+      "levelRange": [1, 20],
+      "accent": "#FF8A5C"
+    }
+  ],
+  "levels": [
+    { "id": 1, "sector": 1, "path": "assets/levels/sector_01/level_001.json" }
+  ]
+}

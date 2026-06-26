@@ -1,0 +1,29 @@
+# NovaPlay lint configuration (Sprint 5).
+# Base: very_good_analysis (strict). A few rules are relaxed so the scaffold and
+# generated code stay green; tighten them as the codebase matures.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "**/firebase_options*.dart"
+    - "lib/generated/**"
+  errors:
+    todo: ignore
+  language:
+    strict-casts: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Relaxed for the scaffold — re-enable as the team adds doc comments.
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    flutter_style_todos: false
+    # Keeps the conventional `flutter:` SDK-first ordering in pubspec.yaml.
+    sort_pub_dependencies: false
+    # Project conventions.
+    prefer_single_quotes: true
+    require_trailing_commas: true

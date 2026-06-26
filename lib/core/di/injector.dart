@@ -1,0 +1,22 @@
+import 'package:get_it/get_it.dart';
+import 'package:novaplay/core/logging/app_logger.dart';
+import 'package:novaplay/core/services/ads_service.dart';
+import 'package:novaplay/core/services/analytics_service.dart';
+import 'package:novaplay/core/services/remote_config_service.dart';
+
+/// The global service locator.
+final GetIt getIt = GetIt.instance;
+
+/// Registers app singletons. For now this is hand-wired; as features grow,
+/// migrate to `injectable` codegen (`dart run build_runner build`) and call the
+/// generated `getIt.init()` here (docs/ARCHITECTURE.md §6).
+Future<void> configureDependencies() async {
+  getIt
+    ..registerLazySingleton<AppLogger>(AppLogger.new)
+    ..registerLazySingleton<AnalyticsService>(NoopAnalyticsService.new)
+    ..registerLazySingleton<RemoteConfigService>(StubRemoteConfigService.new)
+    ..registerLazySingleton<AdsService>(StubAdsService.new);
+
+  await getIt<RemoteConfigService>().init();
+  await getIt<AdsService>().init();
+}

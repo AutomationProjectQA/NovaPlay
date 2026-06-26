@@ -1,0 +1,15 @@
+{
+  "app_title": "NovaPlay",
+  "app_tagline": "Light the constellations.",
+  "home_play": "Play",
+  "home_profile": "Profile",
+  "home_settings": "Settings",
+  "levels_title": "Select Level",
+  "game_level": "Level {}",
+  "game_hint": "Drag to aim, release to launch the spark.",
+  "settings_title": "Settings",
+  "settings_music": "Music",
+  "settings_sound": "Sound effects",
+  "settings_haptics": "Haptics",
+  "profile_title": "Profile"
+}

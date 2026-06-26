@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "sector": 1,
+  "sparks": 5,
+  "parForThreeStars": 2,
+  "introMechanic": "aim",
+  "stars": [
+    { "type": "star", "x": 30, "y": 50 },
+    { "type": "star", "x": 50, "y": 90 },
+    { "type": "star", "x": 70, "y": 60 }
+  ],
+  "elements": [
+    { "type": "wall", "x": 50, "y": 70, "params": { "w": 40, "h": 4 } }
+  ]
+}
