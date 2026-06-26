@@ -7,6 +7,9 @@ abstract final class Routes {
   static const String settings = '/settings';
   static const String profile = '/profile';
 
+  /// Dev-only design-system showcase (Sprint 6).
+  static const String gallery = '/gallery';
+
   /// Builds the concrete game path for a given level id.
   static String gamePath(int levelId) => '/game/$levelId';
 }

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:novaplay/app/env/app_environment.dart';
 import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/app_typography.dart';
@@ -44,6 +45,11 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => context.push(Routes.settings),
               child: Text('home_settings'.tr()),
             ),
+            if (!AppEnvironment.instance.isProd)
+              TextButton(
+                onPressed: () => context.push(Routes.gallery),
+                child: const Text('Design System'),
+              ),
           ],
         ),
       ),

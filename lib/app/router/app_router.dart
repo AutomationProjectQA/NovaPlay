@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/core/widgets/error_screen.dart';
+import 'package:novaplay/features/gallery/presentation/gallery_screen.dart';
 import 'package:novaplay/features/game/presentation/game_screen.dart';
 import 'package:novaplay/features/home/presentation/home_screen.dart';
 import 'package:novaplay/features/levels/presentation/level_select_screen.dart';
@@ -43,6 +44,10 @@ abstract final class AppRouter {
         GoRoute(
           path: Routes.profile,
           builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: Routes.gallery,
+          builder: (context, state) => const GalleryScreen(),
         ),
       ],
     );
