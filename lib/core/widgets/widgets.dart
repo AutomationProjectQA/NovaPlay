@@ -11,6 +11,7 @@ export 'nova_button.dart';
 export 'nova_card.dart';
 export 'nova_controls.dart';
 export 'nova_dialog.dart';
+export 'nova_loading_veil.dart';
 export 'nova_progress.dart';
 export 'nova_sheet.dart';
 export 'nova_skeleton.dart';

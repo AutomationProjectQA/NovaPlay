@@ -23,6 +23,7 @@ spectacle. The v1.0 MVP ships sectors 1–3 (≥ 60 of 100 handcrafted levels). 
 | [`GAME_DESIGN.md`](./GAME_DESIGN.md) | Core loop, mechanics, boosters, economy, progression design | 2 |
 | [`UI_GUIDELINES.md`](./UI_GUIDELINES.md) | IA, screen flows, wireframes, UX & accessibility guidelines | 3 |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | App architecture, stack, min SDKs, data & state | 4 |
+| [`NAVIGATION.md`](./NAVIGATION.md) | Routing model, route table, transitions, guards, analytics observer | 7 |
 | [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) | Visual tokens, typography, color, components | 3 / 6 |
 | [`LEVEL_DESIGN.md`](./LEVEL_DESIGN.md) | Sectors, difficulty curve, level authoring & tooling | 10 |
 | [`MONETIZATION.md`](./MONETIZATION.md) | Economy, ads, IAP, currencies, pricing, targets | 13 / 16 |

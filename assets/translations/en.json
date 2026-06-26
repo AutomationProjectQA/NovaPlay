@@ -1,15 +1,44 @@
 {
   "app_title": "NovaPlay",
   "app_tagline": "Light the constellations.",
-  "home_play": "Play",
-  "home_profile": "Profile",
-  "home_settings": "Settings",
+  "coming_soon": "Coming soon",
+
+  "nav_home": "Home",
+  "nav_daily": "Daily",
+  "nav_shop": "Shop",
+  "nav_profile": "Profile",
+
+  "home_continue": "Continue · Level {}",
+  "home_sector_locked": "Locked — clear earlier sectors",
+
   "levels_title": "Select Level",
+
   "game_level": "Level {}",
   "game_hint": "Drag to aim, release to launch the spark.",
+
+  "daily_title": "Daily",
+  "shop_title": "Shop",
+
+  "profile_achievements": "Achievements",
+  "profile_total_stars": "Total stars",
+  "profile_sector_stars": "Sector stars",
+  "profile_best_streak": "Best streak",
+  "profile_cloud_sync": "Cloud sync: on · just now",
+
   "settings_title": "Settings",
+  "settings_audio": "Audio",
   "settings_music": "Music",
   "settings_sound": "Sound effects",
+  "settings_feel": "Feel",
   "settings_haptics": "Haptics",
-  "profile_title": "Profile"
+  "settings_reduced_motion": "Reduced motion",
+  "settings_general": "General",
+  "settings_language": "Language",
+  "settings_account": "Account",
+  "settings_signed_out": "Signed out",
+  "settings_about": "About",
+  "settings_restore": "Restore purchases",
+  "settings_privacy": "Privacy · Terms",
+  "settings_reset_tutorial": "Reset tutorial",
+  "settings_dev_gallery": "Design System (dev)"
 }

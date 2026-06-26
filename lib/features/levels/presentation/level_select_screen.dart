@@ -1,62 +1,80 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
-import 'package:novaplay/core/widgets/gradient_scaffold.dart';
+import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/levels/domain/sector.dart';
+import 'package:novaplay/features/levels/presentation/levels_providers.dart';
 
-/// Placeholder level grid. Sprint 10 replaces this with sector maps, unlock
-/// gating, and per-level star ratings loaded from progress.
-class LevelSelectScreen extends StatelessWidget {
-  const LevelSelectScreen({super.key});
+/// The level grid for a single sector (docs/UI_GUIDELINES.md §3.3). A full-screen
+/// leaf pushed over the hub shell. Level node states (locked/next/cleared) are
+/// stubbed for Sprint 7; real per-level progress lands in Sprint 10.
+class LevelSelectScreen extends ConsumerWidget {
+  const LevelSelectScreen({required this.sectorId, super.key});
 
-  static const int _previewLevelCount = 20;
+  final int sectorId;
 
   @override
-  Widget build(BuildContext context) {
-    return GradientScaffold(
-      appBar: AppBar(title: Text('levels_title'.tr())),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: GridView.builder(
-          itemCount: _previewLevelCount,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            mainAxisSpacing: AppSpacing.sm,
-            crossAxisSpacing: AppSpacing.sm,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sectors = ref.watch(sectorsProvider);
+    final sector = sectors.firstWhere(
+      (s) => s.id == sectorId,
+      orElse: () => sectors.first,
+    );
+    final continueLevel = ref.watch(continueLevelProvider);
+
+    return NovaScaffold(
+      appBar: AppBar(
+        title: Text(sector.name),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.md),
+            child: Center(
+              child: StarMeter(
+                earned: sector.starsEarned,
+                total: sector.starsTotal,
+              ),
+            ),
           ),
-          itemBuilder: (context, index) {
-            final levelId = index + 1;
-            return _LevelNode(
-              levelId: levelId,
-              onTap: () => context.push(Routes.gamePath(levelId)),
-            );
-          },
+        ],
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        itemCount: sector.levelCount,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: AppSpacing.md,
+          crossAxisSpacing: AppSpacing.md,
         ),
+        itemBuilder: (context, index) {
+          final levelId = sector.firstLevel + index;
+          final state = _stateFor(levelId, continueLevel);
+          return LevelNode(
+            levelId: levelId,
+            state: state,
+            sectorAccent: sector.accent,
+            stars: state == LevelNodeState.cleared ? _stubStars(levelId) : 0,
+            isFinale: levelId == sector.lastLevel,
+            onTap: state == LevelNodeState.locked
+                ? null
+                : () => context.push(Routes.gamePath(levelId)),
+          );
+        },
       ),
     );
   }
+
+  LevelNodeState _stateFor(int levelId, int continueLevel) {
+    if (levelId < continueLevel) return LevelNodeState.cleared;
+    if (levelId == continueLevel) return LevelNodeState.next;
+    return LevelNodeState.locked;
+  }
+
+  int _stubStars(int levelId) => (levelId % 3) + 1;
 }
 
-class _LevelNode extends StatelessWidget {
-  const _LevelNode({required this.levelId, required this.onTap});
-
-  final int levelId;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Center(
-          child: Text(
-            '$levelId',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-      ),
-    );
-  }
+/// Convenience for building a labelled sector chip elsewhere if needed.
+extension SectorLabel on Sector {
+  String get rangeLabel => '$firstLevel–$lastLevel';
 }
