@@ -10,6 +10,8 @@ import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/live/domain/game_event.dart';
+import 'package:novaplay/features/live/presentation/events_provider.dart';
 
 /// Home / Galaxy Map — the default landing hub. Shows the sectors and the single
 /// most prominent action: Continue the next level (docs/UI_GUIDELINES.md §3.2).
@@ -20,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sectors = ref.watch(sectorsProvider);
     final continueLevel = ref.watch(continueLevelProvider);
+    final event = ref.watch(activeEventProvider);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -34,7 +37,9 @@ class HomeScreen extends ConsumerWidget {
           textAlign: TextAlign.center,
           style: context.textTheme.displayLarge,
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.md),
+        _EventBanner(event: event),
+        const SizedBox(height: AppSpacing.md),
         NovaButton(
           label: 'home_continue'.tr(args: ['$continueLevel']),
           icon: Icons.play_arrow,
@@ -55,6 +60,56 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
         ],
       ],
+    );
+  }
+}
+
+class _EventBanner extends StatelessWidget {
+  const _EventBanner({required this.event});
+
+  final GameEvent event;
+
+  @override
+  Widget build(BuildContext context) {
+    return NovaCard(
+      accent: event.accent,
+      isSelected: event.hasBonus,
+      child: Row(
+        children: [
+          Icon(Icons.celebration, color: event.accent),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(event.title, style: context.textTheme.titleMedium),
+                Text(
+                  event.description,
+                  style: context.textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+          if (event.hasBonus)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+                vertical: AppSpacing.xxs,
+              ),
+              decoration: BoxDecoration(
+                color: event.accent,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: Text(
+                '${event.coinMultiplier}×',
+                style: const TextStyle(
+                  color: AppColors.space900,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -56,6 +56,10 @@ class RewardsRepository {
   Future<void> setWheelLastDay(int day) => _put('wheel_last_day', day);
   int get chestLastDay => _getInt('chest_last_day');
   Future<void> setChestLastDay(int day) => _put('chest_last_day', day);
+
+  // Daily challenge (epoch-day it was last completed).
+  int get challengeLastDay => _getInt('challenge_last_day');
+  Future<void> setChallengeLastDay(int day) => _put('challenge_last_day', day);
 }
 
 /// Opens (or reuses) the rewards box, opened at bootstrap.

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/nova_context.dart';
@@ -9,6 +10,9 @@ import 'package:novaplay/core/constants/app_constants.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/ads_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
+import 'package:novaplay/features/live/domain/daily_challenge.dart';
+import 'package:novaplay/features/live/presentation/daily_challenge_provider.dart';
 import 'package:novaplay/features/rewards/domain/daily_reward.dart';
 import 'package:novaplay/features/rewards/domain/mission.dart';
 import 'package:novaplay/features/rewards/domain/reward.dart';
@@ -27,10 +31,49 @@ class DailyScreen extends ConsumerWidget {
     final wheelFree = ref.watch(wheelProvider);
     final chestFree = ref.watch(chestProvider);
     final missions = ref.watch(dailyMissionStatesProvider);
+    final challenge = ref.watch(dailyChallengeProvider);
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
+        const _Header('Daily Challenge'),
+        NovaCard(
+          accent: AppColors.sectorNebula,
+          child: Row(
+            children: [
+              const Icon(Icons.local_fire_department, color: AppColors.nova500),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Level ${challenge.levelId}',
+                      style: context.textTheme.titleMedium,
+                    ),
+                    Text(
+                      '+${kDailyChallengeReward.summary}',
+                      style: context.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              if (challenge.doneToday)
+                const Icon(Icons.check_circle, color: AppColors.success)
+              else
+                NovaButton(
+                  label: 'Play',
+                  expand: false,
+                  onPressed: () => launchLevelOrRefill(
+                    context,
+                    ref,
+                    Routes.gamePath(challenge.levelId),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
         const _Header('Daily Reward'),
         NovaCard(
           child: Column(

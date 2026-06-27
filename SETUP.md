@@ -76,3 +76,19 @@ Keep the same filenames (or update `AudioAssets`). The volume sliders and Haptic
 toggle in Settings control output live; `FlameAudioService` no-ops gracefully if
 a file is missing.
 
+## 7. Live features (Sprint 15)
+
+The live/social features ship with **local implementations** behind app-owned
+interfaces, so they work offline today and swap to a backend later:
+
+- **Leaderboard** — `LocalLeaderboardService` ranks the player against a fixed
+  field. Replace with a `FirestoreLeaderboardService` (read/write a `scores`
+  collection) once Firebase is connected; re-bind it in `core/di/injector.dart`.
+- **Events / seasonal** — derived locally from the calendar (`activeEvent`). Move
+  the event schedule + coin multiplier into **Remote Config** for live control.
+- **Daily Challenge** — fully local and deterministic (no backend needed).
+- **Push notifications** — `NoopNotificationService`. For real reminders add
+  `flutter_local_notifications` (local: lives-full, daily-ready) and wire **FCM**
+  via `firebase_messaging` for remote push; implement `NotificationService` and
+  re-bind it in DI.
+

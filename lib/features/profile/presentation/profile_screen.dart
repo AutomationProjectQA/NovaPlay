@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/nova_context.dart';
@@ -54,6 +56,13 @@ class ProfileScreen extends ConsumerWidget {
                   .claim(state.achievement.id),
             ),
           ),
+        const SizedBox(height: AppSpacing.md),
+        NovaButton(
+          label: 'Leaderboard',
+          icon: Icons.leaderboard,
+          variant: NovaButtonVariant.secondary,
+          onPressed: () => context.push(Routes.leaderboard),
+        ),
         const SizedBox(height: AppSpacing.md),
         const _CloudSyncRow(),
       ],

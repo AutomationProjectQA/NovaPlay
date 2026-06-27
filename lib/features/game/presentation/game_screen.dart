@@ -11,6 +11,7 @@ import 'package:novaplay/core/constants/audio_assets.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
+import 'package:novaplay/core/services/notification_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/economy/domain/booster.dart';
 import 'package:novaplay/features/economy/domain/economy_config.dart';
@@ -21,6 +22,8 @@ import 'package:novaplay/features/game/presentation/gameplay_hud.dart';
 import 'package:novaplay/features/game/presentation/tutorial_overlay.dart';
 import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/live/presentation/daily_challenge_provider.dart';
+import 'package:novaplay/features/live/presentation/events_provider.dart';
 import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 import 'package:novaplay/features/rewards/presentation/missions_providers.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
@@ -151,10 +154,13 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
       ref
           .read(progressProvider.notifier)
           .recordResult(levelId: widget.levelId, stars: result.stars);
-      _coinsAwarded = EconomyConfig.coinsForClear(
-        stars: result.stars,
-        firstClear: firstClear,
-      );
+      final multiplier = ref.read(activeEventProvider).coinMultiplier;
+      _coinsAwarded =
+          EconomyConfig.coinsForClear(
+            stars: result.stars,
+            firstClear: firstClear,
+          ) *
+          multiplier;
       ref.read(walletProvider.notifier).earnCoins(_coinsAwarded);
       ref
           .read(playerXpProvider.notifier)
@@ -165,9 +171,19 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
             ),
           );
       ref.read(missionsProvider.notifier).recordLevelCleared(result.stars);
+      ref
+          .read(dailyChallengeProvider.notifier)
+          .completeIfMatches(widget.levelId);
     } else {
       // A failed attempt consumes a life (docs/CONCEPT.md §7).
       ref.read(livesProvider.notifier).consume();
+      if (ref.read(livesProvider).isEmpty) {
+        unawaited(
+          getIt<NotificationService>().scheduleLivesFull(
+            EconomyConfig.lifeRegenInterval * EconomyConfig.maxLives,
+          ),
+        );
+      }
     }
   }
 

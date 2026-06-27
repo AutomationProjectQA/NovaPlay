@@ -13,6 +13,7 @@ abstract final class Routes {
 
   // Full-screen leaves (over the shell, no bottom nav).
   static const String settings = '/settings';
+  static const String leaderboard = '/leaderboard';
   static const String levelSelect = '/levels/:sectorId';
   static const String game = '/game/:levelId';
 

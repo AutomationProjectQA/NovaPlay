@@ -11,6 +11,7 @@ import 'package:novaplay/features/game/presentation/game_screen.dart';
 import 'package:novaplay/features/home/presentation/home_screen.dart';
 import 'package:novaplay/features/levels/presentation/level_select_screen.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/live/presentation/leaderboard_screen.dart';
 import 'package:novaplay/features/onboarding/presentation/splash_screen.dart';
 import 'package:novaplay/features/profile/presentation/profile_screen.dart';
 import 'package:novaplay/features/settings/presentation/settings_screen.dart';
@@ -63,6 +64,12 @@ abstract final class AppRouter {
                 int.tryParse(state.pathParameters['levelId'] ?? '') ?? 1;
             return _fadePage(state, GameScreen(levelId: levelId));
           },
+        ),
+        GoRoute(
+          path: Routes.leaderboard,
+          name: 'leaderboard',
+          pageBuilder: (context, state) =>
+              _fadePage(state, const LeaderboardScreen()),
         ),
         GoRoute(
           path: Routes.gallery,
