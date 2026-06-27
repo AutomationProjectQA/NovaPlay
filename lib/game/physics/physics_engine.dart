@@ -17,6 +17,9 @@ class StepEvents {
 
   /// True if the spark teleported through a portal this step.
   bool usedPortal = false;
+
+  /// True if the spark bounced off a wall/bumper this step.
+  bool bounced = false;
 }
 
 /// The deterministic spark physics core (docs/ARCHITECTURE.md §8.3, §8.7).
@@ -47,14 +50,15 @@ class PhysicsEngine {
     final events = StepEvents();
     if (!spark.alive) return events;
 
-    _advance(spark, dt);
+    events.bounced = _advance(spark, dt) > 0;
     _resolveTriggers(spark, events);
     return events;
   }
 
-  /// Integration + collision only (no trigger side effects). Shared by [step]
-  /// and the trajectory preview so both behave identically.
-  void _advance(SparkBody spark, double dt) {
+  /// Integration + collision only (no trigger side effects). Returns the number
+  /// of bounces resolved. Shared by [step] and the trajectory preview so both
+  /// behave identically.
+  int _advance(SparkBody spark, double dt) {
     // Gravity wells: radial pull, stronger near the centre, zero past the radius.
     final accel = Vector2.zero();
     for (final well in wells) {
@@ -93,6 +97,7 @@ class PhysicsEngine {
       remaining *= 1 - hit.t;
       bounces++;
     }
+    return bounces;
   }
 
   void _resolveTriggers(SparkBody spark, StepEvents events) {

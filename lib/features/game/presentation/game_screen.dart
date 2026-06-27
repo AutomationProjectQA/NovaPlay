@@ -7,6 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
+import 'package:novaplay/core/constants/audio_assets.dart';
+import 'package:novaplay/core/di/injector.dart';
+import 'package:novaplay/core/services/audio_service.dart';
+import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/game/presentation/game_overlays.dart';
 import 'package:novaplay/features/game/presentation/game_providers.dart';
@@ -20,6 +24,7 @@ import 'package:novaplay/game/nova_game.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
 import 'package:novaplay/game/session/game_result.dart';
 import 'package:novaplay/game/session/game_session_controller.dart';
+import 'package:novaplay/game/session/game_sfx.dart';
 import 'package:novaplay/game/session/game_snapshot.dart';
 import 'package:novaplay/game/session/game_state.dart';
 import 'package:vector_math/vector_math.dart' show Vector2;
@@ -88,7 +93,30 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
       controller: _controller,
       snapshot: snapshot,
       reducedMotion: ref.read(settingsProvider).reducedMotion,
+      onSfx: _onSfx,
     );
+  }
+
+  /// Routes a gameplay cue to audio + haptics.
+  void _onSfx(GameSfx sfx) {
+    final audio = getIt<AudioService>();
+    final haptics = getIt<HapticsService>();
+    switch (sfx) {
+      case GameSfx.launch:
+        audio.playSfx(AudioAssets.sfxLaunch);
+        haptics.light();
+      case GameSfx.bounce:
+        audio.playSfx(AudioAssets.sfxBounce);
+      case GameSfx.starLit:
+        audio.playSfx(AudioAssets.sfxStar);
+        haptics.light();
+      case GameSfx.win:
+        audio.playSfx(AudioAssets.sfxWin);
+        haptics.medium();
+      case GameSfx.lose:
+        audio.playSfx(AudioAssets.sfxLose);
+        haptics.light();
+    }
   }
 
   @override

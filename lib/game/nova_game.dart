@@ -12,6 +12,7 @@ import 'package:novaplay/game/physics/physics_constants.dart';
 import 'package:novaplay/game/physics/physics_engine.dart';
 import 'package:novaplay/game/physics/spark_body.dart';
 import 'package:novaplay/game/session/game_session_controller.dart';
+import 'package:novaplay/game/session/game_sfx.dart';
 import 'package:novaplay/game/session/game_snapshot.dart';
 import 'package:novaplay/game/session/game_state.dart';
 import 'package:novaplay/game/world/level_builder.dart';
@@ -27,6 +28,7 @@ class NovaGame extends FlameGame {
     required this.controller,
     this.snapshot,
     this.reducedMotion = false,
+    this.onSfx,
   }) : super(
          camera: CameraComponent.withFixedResolution(
            width: PhysicsConstants.boardWidth,
@@ -36,6 +38,10 @@ class NovaGame extends FlameGame {
 
   final LevelDefinition level;
   final GameSessionController controller;
+
+  /// Reports gameplay cues (launch, bounce, star-lit, win, lose) so the app can
+  /// play SFX + haptics. Null in headless tests.
+  final void Function(GameSfx sfx)? onSfx;
 
   /// A snapshot to resume from (pause/kill recovery), if any.
   final GameSnapshot? snapshot;
@@ -180,6 +186,7 @@ class NovaGame extends FlameGame {
     );
     clearHint();
     controller.beginShot();
+    onSfx?.call(GameSfx.launch);
     _spark = SparkBody(position: _anchor.clone(), velocity: velocity);
     _sparkComponent
       ..position.setFrom(_anchor)
@@ -270,8 +277,10 @@ class NovaGame extends FlameGame {
       _accumulator -= PhysicsConstants.fixedDt;
       _shotTime += PhysicsConstants.fixedDt;
 
+      if (events.bounced) onSfx?.call(GameSfx.bounce);
       if (events.starsLit.isNotEmpty) {
         events.starsLit.forEach(_lightStar);
+        onSfx?.call(GameSfx.starLit);
         controller.registerStarsLit(events.starsLit.length);
       }
       if (_shotEnded) break;
@@ -321,10 +330,16 @@ class NovaGame extends FlameGame {
 
   void _finalizeShot() {
     _shotActive = false;
-    if (controller.value.isOver) return; // won mid-flight (or already resolved)
+    if (controller.value.status == GameStatus.won) {
+      onSfx?.call(GameSfx.win);
+      return;
+    }
 
     controller.endShot();
-    if (controller.value.isOver) return; // that shot was the losing one
+    if (controller.value.status == GameStatus.lost) {
+      onSfx?.call(GameSfx.lose);
+      return;
+    }
 
     // Reset the spark to the slingshot for the next shot.
     _resetSpark();

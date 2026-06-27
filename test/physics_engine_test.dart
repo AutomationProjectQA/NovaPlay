@@ -19,14 +19,17 @@ void main() {
         velocity: Vector2(120, 0),
       );
 
+      var bounced = false;
       for (var i = 0; i < 240; i++) {
-        engine.step(spark, _dt);
+        if (engine.step(spark, _dt).bounced) bounced = true;
       }
 
       // After hitting the wall it must be travelling back in -x.
       expect(spark.velocity.x, lessThan(0));
       // And it must not have tunnelled through the wall.
       expect(spark.position.x, lessThanOrEqualTo(50));
+      // The bounce must have been reported (drives SFX/haptics).
+      expect(bounced, isTrue);
     });
 
     test('fast spark does not tunnel through a thin wall in one step', () {

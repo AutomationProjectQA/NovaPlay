@@ -56,6 +56,7 @@ dependencies:
   path_provider: ^2.1.6
   shared_preferences: ^2.5.5
   vector_math: ^2.2.0
+  flame_audio: ^2.12.1
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,8 @@ flutter:
     - assets/levels/sector_05/
     - assets/images/
     - assets/audio/
+    - assets/audio/music/
+    - assets/audio/sfx/
 
   # Custom fonts are added in a later sprint (see docs/DESIGN_SYSTEM.md typography).
   # fonts:
