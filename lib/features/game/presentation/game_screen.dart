@@ -22,6 +22,7 @@ import 'package:novaplay/features/game/presentation/tutorial_overlay.dart';
 import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
 import 'package:novaplay/features/progress/presentation/progress_providers.dart';
+import 'package:novaplay/features/rewards/presentation/missions_providers.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
 import 'package:novaplay/game/nova_game.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
@@ -163,6 +164,7 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
               isFinale: widget.levelId % 20 == 0,
             ),
           );
+      ref.read(missionsProvider.notifier).recordLevelCleared(result.stars);
     } else {
       // A failed attempt consumes a life (docs/CONCEPT.md §7).
       ref.read(livesProvider.notifier).consume();

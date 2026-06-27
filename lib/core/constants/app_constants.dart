@@ -11,6 +11,9 @@ abstract final class HiveBoxes {
 
   /// In-flight level snapshots for pause/resume (docs/ARCHITECTURE.md §8.10).
   static const String session = 'session';
+
+  /// Daily rewards, streaks, missions, achievements, chests (Sprint 14).
+  static const String rewards = 'rewards';
 }
 
 /// Remote Config keys (server-tunable; docs/MONETIZATION.md & ARCHITECTURE.md §10).

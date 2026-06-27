@@ -13,6 +13,7 @@ abstract final class HiveInit {
       Hive.openBox<Object>(HiveBoxes.economy),
       Hive.openBox<Object>(HiveBoxes.levelCache),
       Hive.openBox<Object>(HiveBoxes.session),
+      Hive.openBox<Object>(HiveBoxes.rewards),
     ]);
   }
 }

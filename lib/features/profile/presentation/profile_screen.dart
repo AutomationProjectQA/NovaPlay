@@ -7,6 +7,8 @@ import 'package:novaplay/app/theme/nova_context.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/profile/domain/player_profile.dart';
 import 'package:novaplay/features/profile/presentation/profile_providers.dart';
+import 'package:novaplay/features/rewards/domain/achievement.dart';
+import 'package:novaplay/features/rewards/presentation/achievements_providers.dart';
 
 /// Player profile: identity, XP/level, headline stats, achievements, cloud sync
 /// (docs/UI_GUIDELINES.md §3.9). Rendered inside the hub shell.
@@ -42,20 +44,60 @@ class ProfileScreen extends ConsumerWidget {
           style: context.textTheme.bodyMedium?.copyWith(letterSpacing: 1.2),
         ),
         const SizedBox(height: AppSpacing.sm),
-        NovaCard(
-          child: SizedBox(
-            height: 120,
-            child: Center(
-              child: Text(
-                'coming_soon'.tr(),
-                style: context.textTheme.bodyMedium,
-              ),
+        for (final state in ref.watch(achievementStatesProvider))
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: _AchievementTile(
+              state: state,
+              onClaim: () => ref
+                  .read(achievementsProvider.notifier)
+                  .claim(state.achievement.id),
             ),
           ),
-        ),
         const SizedBox(height: AppSpacing.md),
         const _CloudSyncRow(),
       ],
+    );
+  }
+}
+
+class _AchievementTile extends StatelessWidget {
+  const _AchievementTile({required this.state, required this.onClaim});
+
+  final AchievementState state;
+  final VoidCallback onClaim;
+
+  @override
+  Widget build(BuildContext context) {
+    final unlocked = state.isUnlocked;
+    return NovaCard(
+      child: Row(
+        children: [
+          Icon(
+            unlocked ? Icons.emoji_events : Icons.lock_outline,
+            color: unlocked ? AppColors.nova500 : AppColors.onDisabled,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  state.achievement.label,
+                  style: context.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: AppSpacing.xxs),
+                NovaProgressBar(value: state.fraction),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          if (state.claimed)
+            const Icon(Icons.check_circle, color: AppColors.success)
+          else if (state.canClaim)
+            NovaButton(label: 'Claim', expand: false, onPressed: onClaim),
+        ],
+      ),
     );
   }
 }
