@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
+import 'package:novaplay/features/levels/data/level_asset_repository.dart';
+import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 
 /// The five sectors with the player's progress. Stubbed for Sprint 7 (the first
@@ -57,3 +59,16 @@ final sectorsProvider = Provider<List<Sector>>((ref) {
 
 /// The level the "Continue" affordance should launch. Stubbed for Sprint 7.
 final continueLevelProvider = Provider<int>((ref) => 5);
+
+/// Loads level definitions from assets (with a generated fallback).
+final levelRepositoryProvider = Provider<LevelAssetRepository>((ref) {
+  return const LevelAssetRepository();
+});
+
+/// Loads a single [LevelDefinition] by id.
+final levelProvider = FutureProvider.family<LevelDefinition, int>((
+  ref,
+  levelId,
+) {
+  return ref.read(levelRepositoryProvider).load(levelId);
+});

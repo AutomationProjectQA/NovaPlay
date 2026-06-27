@@ -8,6 +8,9 @@ abstract final class HiveBoxes {
   static const String settings = 'settings';
   static const String economy = 'economy';
   static const String levelCache = 'level_cache';
+
+  /// In-flight level snapshots for pause/resume (docs/ARCHITECTURE.md §8.10).
+  static const String session = 'session';
 }
 
 /// Remote Config keys (server-tunable; docs/MONETIZATION.md & ARCHITECTURE.md §10).

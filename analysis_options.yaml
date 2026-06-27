@@ -24,6 +24,8 @@ linter:
     flutter_style_todos: false
     # Keeps the conventional `flutter:` SDK-first ordering in pubspec.yaml.
     sort_pub_dependencies: false
+    # Riverpod provider/family types and small const locals read fine untyped.
+    specify_nonobvious_property_types: false
     # Project conventions.
     prefer_single_quotes: true
     require_trailing_commas: true

@@ -12,6 +12,7 @@ abstract final class HiveInit {
       Hive.openBox<Object>(HiveBoxes.settings),
       Hive.openBox<Object>(HiveBoxes.economy),
       Hive.openBox<Object>(HiveBoxes.levelCache),
+      Hive.openBox<Object>(HiveBoxes.session),
     ]);
   }
 }

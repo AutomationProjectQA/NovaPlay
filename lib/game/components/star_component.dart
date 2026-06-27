@@ -2,25 +2,52 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 
-/// A dim star target. Lights up when the spark passes through it.
-/// Full collision/lighting logic arrives in the engine sprint (Sprint 8).
-class StarComponent extends CircleComponent {
-  StarComponent({required super.position})
-    : super(
-        radius: 10,
-        anchor: Anchor.center,
-        paint: Paint()..color = AppColors.starDim,
-      );
+/// A dim star target rendered on the board. Visual only — the authoritative lit
+/// state lives in the physics `StarTarget`; the engine calls [light] when the
+/// spark touches it (docs/ARCHITECTURE.md §8.2, §8.6).
+class StarComponent extends PositionComponent {
+  StarComponent({required Vector2 position, this.radius = 3})
+    : super(position: position, anchor: Anchor.center, priority: 30);
 
+  final double radius;
   bool _lit = false;
 
-  /// Whether this star has been lit.
   bool get isLit => _lit;
 
-  /// Lights the star (changes its color). Idempotent.
-  void light() {
-    if (_lit) return;
-    _lit = true;
-    paint.color = AppColors.starLit;
+  /// Lights the star. Idempotent.
+  void light() => _lit = true;
+
+  @override
+  void render(Canvas canvas) {
+    if (_lit) {
+      canvas
+        ..drawCircle(
+          Offset.zero,
+          radius * 2,
+          Paint()
+            ..color = AppColors.nova500.withValues(alpha: 0.35)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+        )
+        ..drawCircle(
+          Offset.zero,
+          radius,
+          Paint()..color = AppColors.starLit,
+        );
+    } else {
+      canvas
+        ..drawCircle(
+          Offset.zero,
+          radius,
+          Paint()..color = AppColors.starDim.withValues(alpha: 0.4),
+        )
+        ..drawCircle(
+          Offset.zero,
+          radius,
+          Paint()
+            ..color = AppColors.starDim
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 0.6,
+        );
+    }
   }
 }
