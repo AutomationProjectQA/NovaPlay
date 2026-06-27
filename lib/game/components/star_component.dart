@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 
@@ -20,6 +21,24 @@ class StarComponent extends PositionComponent {
   /// Sets the lit state directly (used by undo/restart to re-dim a star).
   // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
   void setLit(bool value) => _lit = value;
+
+  /// A quick scale "pop" celebrating the moment the star lights
+  /// (docs/DESIGN_SYSTEM.md §5). No-op under reduced motion.
+  void pop({required bool reducedMotion}) {
+    if (reducedMotion) return;
+    // Fire-and-forget effect; Flame manages its lifecycle.
+    // ignore: discarded_futures
+    add(
+      ScaleEffect.by(
+        Vector2.all(1.4),
+        EffectController(
+          duration: 0.12,
+          reverseDuration: 0.12,
+          curve: Curves.easeOutBack,
+        ),
+      ),
+    );
+  }
 
   @override
   void render(Canvas canvas) {

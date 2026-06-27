@@ -6,6 +6,8 @@ import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/game/components/hint_component.dart';
 import 'package:novaplay/game/components/spark_component.dart';
 import 'package:novaplay/game/components/trajectory_preview.dart';
+import 'package:novaplay/game/effects/bloom_component.dart';
+import 'package:novaplay/game/effects/spark_burst.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
 import 'package:novaplay/game/physics/physics_engine.dart';
 import 'package:novaplay/game/physics/spark_body.dart';
@@ -20,19 +22,29 @@ import 'package:novaplay/game/world/level_builder.dart';
 /// [GameSessionController]. Input is fed in as logical board coordinates from
 /// the Flutter gesture layer (`GameScreen`).
 class NovaGame extends FlameGame {
-  NovaGame({required this.level, required this.controller, this.snapshot})
-    : super(
-        camera: CameraComponent.withFixedResolution(
-          width: PhysicsConstants.boardWidth,
-          height: PhysicsConstants.boardHeight,
-        ),
-      );
+  NovaGame({
+    required this.level,
+    required this.controller,
+    this.snapshot,
+    this.reducedMotion = false,
+  }) : super(
+         camera: CameraComponent.withFixedResolution(
+           width: PhysicsConstants.boardWidth,
+           height: PhysicsConstants.boardHeight,
+         ),
+       );
 
   final LevelDefinition level;
   final GameSessionController controller;
 
   /// A snapshot to resume from (pause/kill recovery), if any.
   final GameSnapshot? snapshot;
+
+  /// When true, particle bursts, pops, and the victory bloom are suppressed
+  /// (docs/DESIGN_SYSTEM.md §5 reduced-motion rule).
+  final bool reducedMotion;
+
+  bool _bloomShown = false;
 
   /// Minimum drag length (logical units) before a launch is registered.
   static const double _minDrag = 4;
@@ -208,6 +220,7 @@ class NovaGame extends FlameGame {
   /// Restarts the level in place: clears progress, sparks, and the board.
   void restartLevel() {
     _undoStack.clear();
+    _bloomShown = false;
     controller.reset();
     for (var i = 0; i < _field.stars.length; i++) {
       _field.stars[i].hits = 0;
@@ -258,9 +271,7 @@ class NovaGame extends FlameGame {
       _shotTime += PhysicsConstants.fixedDt;
 
       if (events.starsLit.isNotEmpty) {
-        for (final index in events.starsLit) {
-          _field.starComponents[index].light();
-        }
+        events.starsLit.forEach(_lightStar);
         controller.registerStarsLit(events.starsLit.length);
       }
       if (_shotEnded) break;
@@ -269,7 +280,37 @@ class NovaGame extends FlameGame {
     _sparkComponent.position.setFrom(_spark.position);
     _sparkComponent.pushTrail(_spark.position);
 
+    _maybeShowVictoryBloom();
     if (_shotEnded) _finalizeShot();
+  }
+
+  /// Lights a star with its celebratory pop and particle burst.
+  void _lightStar(int index) {
+    _field.starComponents[index]
+      ..light()
+      ..pop(reducedMotion: reducedMotion);
+    if (!reducedMotion) {
+      // Fire-and-forget particle effect; it auto-removes when spent.
+      // ignore: discarded_futures
+      world.add(sparkBurst(_field.stars[index].center, seed: index + 1));
+    }
+  }
+
+  /// Emits the one victory spectacle when the level is first won.
+  void _maybeShowVictoryBloom() {
+    if (_bloomShown || controller.value.status != GameStatus.won) return;
+    _bloomShown = true;
+    if (reducedMotion) return;
+    // Fire-and-forget effect; the bloom removes itself when finished.
+    // ignore: discarded_futures
+    world.add(
+      BloomComponent(
+        position: Vector2(
+          PhysicsConstants.boardWidth / 2,
+          PhysicsConstants.boardHeight / 2,
+        ),
+      ),
+    );
   }
 
   bool get _shotEnded =>

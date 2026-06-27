@@ -87,6 +87,7 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
       level: widget.level,
       controller: _controller,
       snapshot: snapshot,
+      reducedMotion: ref.read(settingsProvider).reducedMotion,
     );
   }
 
@@ -165,6 +166,9 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     final showTutorial =
         widget.levelId == 1 &&
         !ref.watch(settingsProvider.select((s) => s.tutorialSeen));
+    final reducedMotion = ref.watch(
+      settingsProvider.select((s) => s.reducedMotion),
+    );
     return NovaScaffold(
       body: Stack(
         children: [
@@ -198,6 +202,7 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                   stars: result.stars,
                   coins: result.stars * 40,
                   starsRemaining: state.starsTotal - state.starsLit,
+                  reducedMotion: reducedMotion,
                   onNext: () =>
                       _navigateTo(Routes.gamePath(widget.levelId + 1)),
                   onReplay: _restart,
