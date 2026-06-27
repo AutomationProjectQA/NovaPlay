@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/economy/presentation/economy_providers.dart';
+import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
 
 /// The persistent top HUD on hub screens: settings gear · coins · stardust ·
 /// lives pill (docs/UI_GUIDELINES.md §1, §3.2). Hidden during gameplay.
@@ -48,10 +51,7 @@ class HubTopBar extends ConsumerWidget {
             lives: lives.current,
             maxLives: lives.max,
             countdown: lives.nextRegen,
-            onTap: () => showNovaSnackBar(
-              context,
-              message: 'Lives refill coming soon',
-            ),
+            onTap: () => unawaited(showLivesRefillSheet(context, ref)),
           ),
         ],
       ),

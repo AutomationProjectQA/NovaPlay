@@ -1,12 +1,16 @@
 import 'package:equatable/equatable.dart';
 
-/// The player's spendable balances (docs/CONCEPT.md §7). Full economy logic
-/// (earning, spending, persistence) arrives in Sprint 13.
+/// The player's spendable balances (docs/CONCEPT.md §7).
 class Wallet extends Equatable {
   const Wallet({this.coins = 0, this.stardust = 0});
 
   final int coins;
   final int stardust;
+
+  bool canAfford(int coinCost) => coins >= coinCost;
+
+  Wallet copyWith({int? coins, int? stardust}) =>
+      Wallet(coins: coins ?? this.coins, stardust: stardust ?? this.stardust);
 
   @override
   List<Object?> get props => [coins, stardust];
@@ -23,6 +27,7 @@ class Lives extends Equatable {
   final Duration? nextRegen;
 
   bool get isFull => current >= max;
+  bool get isEmpty => current <= 0;
 
   @override
   List<Object?> get props => [current, max, nextRegen];

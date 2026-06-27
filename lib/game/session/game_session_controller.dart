@@ -111,5 +111,15 @@ class GameSessionController {
     _state.value = _initial;
   }
 
+  /// Grants one extra spark after a loss (Extra Spark booster / rewarded
+  /// continue), returning the session to aiming.
+  void grantExtraSpark() {
+    if (value.status != GameStatus.lost) return;
+    _state.value = value.copyWith(
+      sparksRemaining: 1,
+      status: GameStatus.aiming,
+    );
+  }
+
   void dispose() => _state.dispose();
 }

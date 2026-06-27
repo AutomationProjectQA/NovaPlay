@@ -12,6 +12,9 @@ import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/economy/domain/booster.dart';
+import 'package:novaplay/features/economy/domain/economy_config.dart';
+import 'package:novaplay/features/economy/presentation/economy_providers.dart';
 import 'package:novaplay/features/game/presentation/game_overlays.dart';
 import 'package:novaplay/features/game/presentation/game_providers.dart';
 import 'package:novaplay/features/game/presentation/gameplay_hud.dart';
@@ -64,6 +67,9 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     with WidgetsBindingObserver {
   late final GameSessionController _controller;
   late final NovaGame _game;
+
+  /// Coins awarded for the most recent win (shown in the Win overlay).
+  int _coinsAwarded = 0;
 
   @override
   void initState() {
@@ -137,12 +143,35 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
   }
 
   void _onComplete(GameResult result) {
-    // Level finished: drop the resume snapshot and record best stars on a win.
+    // Level finished: drop the resume snapshot.
     unawaited(ref.read(sessionRepositoryProvider).clear(widget.levelId));
     if (result.won) {
+      final firstClear = (ref.read(progressProvider)[widget.levelId] ?? 0) == 0;
       ref
           .read(progressProvider.notifier)
           .recordResult(levelId: widget.levelId, stars: result.stars);
+      _coinsAwarded = EconomyConfig.coinsForClear(
+        stars: result.stars,
+        firstClear: firstClear,
+      );
+      ref.read(walletProvider.notifier).earnCoins(_coinsAwarded);
+      ref
+          .read(playerXpProvider.notifier)
+          .addXp(
+            EconomyConfig.xpForClear(
+              stars: result.stars,
+              isFinale: widget.levelId % 20 == 0,
+            ),
+          );
+    } else {
+      // A failed attempt consumes a life (docs/CONCEPT.md §7).
+      ref.read(livesProvider.notifier).consume();
+    }
+  }
+
+  void _useExtraSpark() {
+    if (ref.read(boostersProvider.notifier).use(BoosterType.extraSpark)) {
+      _game.continueWithExtraSpark();
     }
   }
 
@@ -197,6 +226,9 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     final reducedMotion = ref.watch(
       settingsProvider.select((s) => s.reducedMotion),
     );
+    final extraSparks = ref.watch(
+      boostersProvider.select((b) => b[BoosterType.extraSpark] ?? 0),
+    );
     return NovaScaffold(
       body: Stack(
         children: [
@@ -228,9 +260,11 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                 final overlay = overlayForStatus(
                   status: state.status,
                   stars: result.stars,
-                  coins: result.stars * 40,
+                  coins: _coinsAwarded,
                   starsRemaining: state.starsTotal - state.starsLit,
                   reducedMotion: reducedMotion,
+                  extraSparkCount: extraSparks,
+                  onExtraSpark: _useExtraSpark,
                   onNext: () =>
                       _navigateTo(Routes.gamePath(widget.levelId + 1)),
                   onReplay: _restart,

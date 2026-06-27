@@ -238,6 +238,15 @@ class NovaGame extends FlameGame {
     _resetSpark();
   }
 
+  /// Resumes play after a loss with one extra spark (Extra Spark booster).
+  void continueWithExtraSpark() {
+    controller.grantExtraSpark();
+    if (controller.value.status == GameStatus.aiming) {
+      _shotActive = false;
+      _resetSpark();
+    }
+  }
+
   /// Shows a guide line toward the nearest unlit star.
   void showHint() {
     if (controller.value.isOver) return;

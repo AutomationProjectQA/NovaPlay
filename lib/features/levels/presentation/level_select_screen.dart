@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
 import 'package:novaplay/features/progress/presentation/progress_providers.dart';
@@ -61,7 +61,11 @@ class LevelSelectScreen extends ConsumerWidget {
             isFinale: levelId == sector.lastLevel,
             onTap: state == LevelNodeState.locked
                 ? null
-                : () => context.push(Routes.gamePath(levelId)),
+                : () => launchLevelOrRefill(
+                    context,
+                    ref,
+                    Routes.gamePath(levelId),
+                  ),
           );
         },
       ),

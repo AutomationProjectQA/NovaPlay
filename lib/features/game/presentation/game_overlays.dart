@@ -160,6 +160,8 @@ class LoseOverlay extends StatelessWidget {
   const LoseOverlay({
     required this.starsRemaining,
     required this.reducedMotion,
+    required this.extraSparkCount,
+    required this.onExtraSpark,
     required this.onRetry,
     required this.onMap,
     super.key,
@@ -167,6 +169,10 @@ class LoseOverlay extends StatelessWidget {
 
   final int starsRemaining;
   final bool reducedMotion;
+
+  /// Owned Extra Spark boosters; when > 0 a "continue" option is offered.
+  final int extraSparkCount;
+  final VoidCallback onExtraSpark;
   final VoidCallback onRetry;
   final VoidCallback onMap;
 
@@ -184,7 +190,20 @@ class LoseOverlay extends StatelessWidget {
             style: context.textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.lg),
-          NovaButton(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
+          if (extraSparkCount > 0) ...[
+            NovaButton(
+              label: 'Use Extra Spark ($extraSparkCount)',
+              icon: Icons.flash_on,
+              onPressed: onExtraSpark,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            NovaButton(
+              label: 'Retry',
+              variant: NovaButtonVariant.secondary,
+              onPressed: onRetry,
+            ),
+          ] else
+            NovaButton(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
           const SizedBox(height: AppSpacing.xs),
           NovaButton(
             label: 'Map',
@@ -251,6 +270,8 @@ Widget? overlayForStatus({
   required int coins,
   required int starsRemaining,
   required bool reducedMotion,
+  required int extraSparkCount,
+  required VoidCallback onExtraSpark,
   required VoidCallback onNext,
   required VoidCallback onReplay,
   required VoidCallback onRetry,
@@ -273,6 +294,8 @@ Widget? overlayForStatus({
       return LoseOverlay(
         starsRemaining: starsRemaining,
         reducedMotion: reducedMotion,
+        extraSparkCount: extraSparkCount,
+        onExtraSpark: onExtraSpark,
         onRetry: onRetry,
         onMap: onMap,
       );

@@ -7,6 +7,7 @@ import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/nova_context.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
 
@@ -37,7 +38,11 @@ class HomeScreen extends ConsumerWidget {
         NovaButton(
           label: 'home_continue'.tr(args: ['$continueLevel']),
           icon: Icons.play_arrow,
-          onPressed: () => context.push(Routes.gamePath(continueLevel)),
+          onPressed: () => launchLevelOrRefill(
+            context,
+            ref,
+            Routes.gamePath(continueLevel),
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         for (final sector in sectors) ...[
