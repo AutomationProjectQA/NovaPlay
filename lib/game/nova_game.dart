@@ -3,6 +3,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/features/levels/domain/level_definition.dart';
+import 'package:novaplay/game/components/hint_component.dart';
 import 'package:novaplay/game/components/spark_component.dart';
 import 'package:novaplay/game/components/trajectory_preview.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
@@ -40,7 +41,10 @@ class NovaGame extends FlameGame {
   late final LevelField _field;
   late final SparkComponent _sparkComponent;
   late final TrajectoryPreview _preview;
+  late final HintComponent _hint;
   late final Vector2 _anchor;
+
+  final List<_ShotMemento> _undoStack = [];
 
   SparkBody _spark = SparkBody(position: Vector2.zero());
   bool _shotActive = false;
@@ -72,10 +76,12 @@ class NovaGame extends FlameGame {
 
     _spark = SparkBody(position: _anchor.clone());
     _preview = TrajectoryPreview();
+    _hint = HintComponent(origin: _anchor);
     _sparkComponent = SparkComponent(position: _anchor.clone());
 
     await world.addAll(_field.visuals);
     await world.add(_preview);
+    await world.add(_hint);
     await world.add(_sparkComponent);
 
     _applySnapshot();
@@ -106,6 +112,7 @@ class NovaGame extends FlameGame {
     if (_shotActive || controller.value.status != GameStatus.aiming) return;
     _aiming = true;
     _aimPoint = point;
+    clearHint();
     _refreshPreview();
   }
 
@@ -152,6 +159,14 @@ class NovaGame extends FlameGame {
   void _launch() {
     final velocity = _launchVelocity();
     if (velocity == null) return;
+    // Capture pre-shot state so this shot can be rewound (Undo / Rewind booster).
+    _undoStack.add(
+      _ShotMemento(
+        sparksRemaining: controller.value.sparksRemaining,
+        starHits: [for (final star in _field.stars) star.hits],
+      ),
+    );
+    clearHint();
     controller.beginShot();
     _spark = SparkBody(position: _anchor.clone(), velocity: velocity);
     _sparkComponent
@@ -160,6 +175,73 @@ class NovaGame extends FlameGame {
     _shotActive = true;
     _shotTime = 0;
     _accumulator = 0;
+  }
+
+  // ── Undo / Restart / Hint (docs/GAME_DESIGN.md) ──
+
+  /// Whether the last shot can be rewound.
+  bool get canUndo =>
+      _undoStack.isNotEmpty &&
+      !_shotActive &&
+      controller.value.status != GameStatus.won;
+
+  /// Rewinds the last shot: restores the spark and re-dims any star it lit.
+  void undo() {
+    if (!canUndo) return;
+    final memento = _undoStack.removeLast();
+    for (var i = 0; i < _field.stars.length; i++) {
+      final hits = i < memento.starHits.length ? memento.starHits[i] : 0;
+      _field.stars[i].hits = hits;
+      _field.starComponents[i].setLit(_field.stars[i].isLit);
+    }
+    final lit = _field.stars.where((s) => s.isLit).length;
+    controller.restore(
+      controller.value.copyWith(
+        sparksRemaining: memento.sparksRemaining,
+        starsLit: lit,
+        status: GameStatus.aiming,
+      ),
+    );
+    _resetSpark();
+  }
+
+  /// Restarts the level in place: clears progress, sparks, and the board.
+  void restartLevel() {
+    _undoStack.clear();
+    controller.reset();
+    for (var i = 0; i < _field.stars.length; i++) {
+      _field.stars[i].hits = 0;
+      _field.starComponents[i].setLit(false);
+    }
+    clearHint();
+    _shotActive = false;
+    _resetSpark();
+  }
+
+  /// Shows a guide line toward the nearest unlit star.
+  void showHint() {
+    if (controller.value.isOver) return;
+    Vector2? nearest;
+    var best = double.infinity;
+    for (final star in _field.stars) {
+      if (star.isLit) continue;
+      final d = star.center.distanceTo(_anchor);
+      if (d < best) {
+        best = d;
+        nearest = star.center;
+      }
+    }
+    _hint.target = nearest?.clone();
+  }
+
+  /// Hides the hint guide.
+  void clearHint() => _hint.target = null;
+
+  void _resetSpark() {
+    _spark = SparkBody(position: _anchor.clone());
+    _sparkComponent
+      ..position.setFrom(_anchor)
+      ..resetTrail();
   }
 
   // ── Fixed-timestep simulation (docs/ARCHITECTURE.md §8.8) ──
@@ -204,9 +286,14 @@ class NovaGame extends FlameGame {
     if (controller.value.isOver) return; // that shot was the losing one
 
     // Reset the spark to the slingshot for the next shot.
-    _spark = SparkBody(position: _anchor.clone());
-    _sparkComponent
-      ..position.setFrom(_anchor)
-      ..resetTrail();
+    _resetSpark();
   }
+}
+
+/// Captured state for one shot, enabling Undo / Rewind (docs/GAME_DESIGN.md).
+class _ShotMemento {
+  _ShotMemento({required this.sparksRemaining, required this.starHits});
+
+  final int sparksRemaining;
+  final List<int> starHits;
 }

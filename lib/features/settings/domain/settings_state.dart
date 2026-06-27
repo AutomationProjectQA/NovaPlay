@@ -9,6 +9,7 @@ class SettingsState extends Equatable {
     this.haptics = true,
     this.reducedMotion = false,
     this.languageCode = 'en',
+    this.tutorialSeen = false,
   });
 
   /// Builds settings from a stored JSON-ish map, falling back to defaults.
@@ -18,6 +19,7 @@ class SettingsState extends Equatable {
     haptics: map['haptics'] as bool? ?? true,
     reducedMotion: map['reducedMotion'] as bool? ?? false,
     languageCode: map['languageCode'] as String? ?? 'en',
+    tutorialSeen: map['tutorialSeen'] as bool? ?? false,
   );
 
   final double musicVolume;
@@ -26,12 +28,16 @@ class SettingsState extends Equatable {
   final bool reducedMotion;
   final String languageCode;
 
+  /// Whether the Level 1 onboarding coach marks have been completed.
+  final bool tutorialSeen;
+
   Map<String, dynamic> toMap() => {
     'musicVolume': musicVolume,
     'sfxVolume': sfxVolume,
     'haptics': haptics,
     'reducedMotion': reducedMotion,
     'languageCode': languageCode,
+    'tutorialSeen': tutorialSeen,
   };
 
   SettingsState copyWith({
@@ -40,6 +46,7 @@ class SettingsState extends Equatable {
     bool? haptics,
     bool? reducedMotion,
     String? languageCode,
+    bool? tutorialSeen,
   }) {
     return SettingsState(
       musicVolume: musicVolume ?? this.musicVolume,
@@ -47,6 +54,7 @@ class SettingsState extends Equatable {
       haptics: haptics ?? this.haptics,
       reducedMotion: reducedMotion ?? this.reducedMotion,
       languageCode: languageCode ?? this.languageCode,
+      tutorialSeen: tutorialSeen ?? this.tutorialSeen,
     );
   }
 
@@ -57,5 +65,6 @@ class SettingsState extends Equatable {
     haptics,
     reducedMotion,
     languageCode,
+    tutorialSeen,
   ];
 }

@@ -15,6 +15,14 @@
 
   "game_level": "Level {}",
   "game_hint": "Drag to aim, release to launch the spark.",
+  "game_hint_action": "Hint",
+  "game_undo": "Undo",
+  "tutorial_step_aim": "Drag back from the spark to aim.",
+  "tutorial_step_release": "Release to launch — follow the dotted path.",
+  "tutorial_step_light": "Light every star before your sparks run out.",
+  "tutorial_skip": "Skip",
+  "tutorial_next": "Next",
+  "tutorial_got_it": "Got it",
 
   "daily_title": "Daily",
   "shop_title": "Shop",
@@ -40,5 +48,6 @@
   "settings_restore": "Restore purchases",
   "settings_privacy": "Privacy · Terms",
   "settings_reset_tutorial": "Reset tutorial",
+  "settings_tutorial_reset": "Tutorial reset",
   "settings_dev_gallery": "Design System (dev)"
 }

@@ -89,7 +89,14 @@ class SettingsScreen extends ConsumerWidget {
               ),
               _NavTile(
                 label: 'settings_reset_tutorial'.tr(),
-                onTap: () => _todo(context),
+                onTap: () {
+                  notifier.setTutorialSeen(seen: false);
+                  showNovaSnackBar(
+                    context,
+                    message: 'settings_tutorial_reset'.tr(),
+                    status: NovaSnackStatus.success,
+                  );
+                },
               ),
               if (!AppEnvironment.instance.isProd)
                 _NavTile(

@@ -34,6 +34,9 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void setLanguage(String languageCode) =>
       _update(state.copyWith(languageCode: languageCode));
 
+  void setTutorialSeen({required bool seen}) =>
+      _update(state.copyWith(tutorialSeen: seen));
+
   void _update(SettingsState next) {
     state = next;
     unawaited(ref.read(settingsRepositoryProvider).save(next));

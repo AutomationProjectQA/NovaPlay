@@ -11,9 +11,11 @@ class GameSessionController {
     required this.levelId,
     required GameState initial,
     this.onComplete,
-  }) : _state = ValueNotifier(initial);
+  }) : _initial = initial,
+       _state = ValueNotifier(initial);
 
   final int levelId;
+  final GameState _initial;
   final ValueNotifier<GameState> _state;
 
   /// Called once when the level is won or lost.
@@ -102,6 +104,12 @@ class GameSessionController {
   /// §8.10).
   // ignore: use_setters_to_change_properties
   void restore(GameState snapshot) => _state.value = snapshot;
+
+  /// Resets the session to its initial state (in-place restart).
+  void reset() {
+    _statusBeforePause = null;
+    _state.value = _initial;
+  }
 
   void dispose() => _state.dispose();
 }

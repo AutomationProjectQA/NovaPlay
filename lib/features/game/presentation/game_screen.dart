@@ -1,16 +1,20 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flame/game.dart' show GameWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
+import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/game/presentation/game_overlays.dart';
 import 'package:novaplay/features/game/presentation/game_providers.dart';
 import 'package:novaplay/features/game/presentation/gameplay_hud.dart';
+import 'package:novaplay/features/game/presentation/tutorial_overlay.dart';
 import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/settings/presentation/settings_providers.dart';
 import 'package:novaplay/game/nova_game.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
 import 'package:novaplay/game/session/game_result.dart';
@@ -141,8 +145,21 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     if (mounted) context.pushReplacement(location);
   }
 
+  /// Restarts the level in place (no reload) and drops any snapshot.
+  void _restart() {
+    _game.restartLevel();
+    unawaited(ref.read(sessionRepositoryProvider).clear(widget.levelId));
+  }
+
+  void _completeTutorial() {
+    ref.read(settingsProvider.notifier).setTutorialSeen(seen: true);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final showTutorial =
+        widget.levelId == 1 &&
+        !ref.watch(settingsProvider.select((s) => s.tutorialSeen));
     return NovaScaffold(
       body: Stack(
         children: [
@@ -178,13 +195,15 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                   starsRemaining: state.starsTotal - state.starsLit,
                   onNext: () =>
                       _navigateTo(Routes.gamePath(widget.levelId + 1)),
-                  onReplay: () => _navigateTo(Routes.gamePath(widget.levelId)),
-                  onRetry: () => _navigateTo(Routes.gamePath(widget.levelId)),
+                  onReplay: _restart,
+                  onRetry: _restart,
                   onMap: () => context.go(Routes.home),
                   onResume: _controller.resume,
-                  onRestart: () => _navigateTo(Routes.gamePath(widget.levelId)),
+                  onRestart: _restart,
                   onQuit: () => context.go(Routes.home),
                 );
+                final showActions =
+                    !state.isOver && state.status != GameStatus.paused;
                 return Stack(
                   children: [
                     Align(
@@ -195,13 +214,63 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                         onPause: _pause,
                       ),
                     ),
+                    if (showActions)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: _ActionBar(
+                          onHint: _game.showHint,
+                          onUndo: _game.canUndo ? _game.undo : null,
+                        ),
+                      ),
                     if (overlay != null) Positioned.fill(child: overlay),
                   ],
                 );
               },
             ),
           ),
+          if (showTutorial)
+            Positioned.fill(
+              child: TutorialOverlay(onDone: _completeTutorial),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+/// The in-play bottom action tray: Hint and Undo (Rewind). Undo is disabled
+/// when there is no shot to rewind (docs/UI_GUIDELINES.md §3.4 booster tray).
+class _ActionBar extends StatelessWidget {
+  const _ActionBar({required this.onHint, required this.onUndo});
+
+  final VoidCallback onHint;
+  final VoidCallback? onUndo;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            NovaButton(
+              label: 'game_hint_action'.tr(),
+              icon: Icons.lightbulb_outline,
+              variant: NovaButtonVariant.secondary,
+              expand: false,
+              onPressed: onHint,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            NovaButton(
+              label: 'game_undo'.tr(),
+              icon: Icons.undo,
+              variant: NovaButtonVariant.secondary,
+              expand: false,
+              onPressed: onUndo,
+            ),
+          ],
+        ),
       ),
     );
   }

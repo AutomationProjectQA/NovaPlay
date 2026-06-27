@@ -17,6 +17,10 @@ class StarComponent extends PositionComponent {
   /// Lights the star. Idempotent.
   void light() => _lit = true;
 
+  /// Sets the lit state directly (used by undo/restart to re-dim a star).
+  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
+  void setLit(bool value) => _lit = value;
+
   @override
   void render(Canvas canvas) {
     if (_lit) {

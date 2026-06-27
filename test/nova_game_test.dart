@@ -32,7 +32,9 @@ void main() {
     final game = NovaGame(level: _oneStarLevel(), controller: controller);
 
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+      MaterialApp(
+        home: Scaffold(body: GameWidget<NovaGame>(game: game)),
+      ),
     );
     await _pumpUntilLoaded(tester, game);
 
@@ -50,7 +52,9 @@ void main() {
     final game = NovaGame(level: _oneStarLevel(), controller: controller);
 
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+      MaterialApp(
+        home: Scaffold(body: GameWidget<NovaGame>(game: game)),
+      ),
     );
     await _pumpUntilLoaded(tester, game);
 
@@ -73,5 +77,84 @@ void main() {
 
     expect(controller.value.starsLit, 1);
     expect(controller.value.status, GameStatus.won);
+  });
+
+  testWidgets('undo rewinds the last shot: spark restored, star re-dimmed', (
+    tester,
+  ) async {
+    // Two stars so lighting one does not win; the level stays in progress.
+    const level = LevelDefinition(
+      id: 1,
+      sector: 1,
+      sparks: 3,
+      parForThreeStars: 3,
+      stars: [
+        LevelElement(type: 'star', x: 50, y: 80),
+        LevelElement(type: 'star', x: 10, y: 20),
+      ],
+      elements: [],
+    );
+    final controller = GameSessionController(
+      levelId: 1,
+      initial: GameState.initial(sparks: 3, starsTotal: 2, parForThreeStars: 3),
+    );
+    final game = NovaGame(level: level, controller: controller);
+
+    await tester.pumpWidget(
+      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+    );
+    await _pumpUntilLoaded(tester, game);
+
+    const mid = PhysicsConstants.boardWidth / 2;
+    game
+      ..aimStart(Vector2(mid, 158))
+      ..aimUpdate(Vector2(mid, 230))
+      ..aimEnd();
+    for (var i = 0; i < 400 && controller.value.status != GameStatus.aiming; i++) {
+      game.update(1 / 60);
+    }
+
+    expect(controller.value.starsLit, 1);
+    expect(controller.value.sparksRemaining, 2);
+    expect(game.canUndo, isTrue);
+
+    game.undo();
+
+    expect(controller.value.starsLit, 0);
+    expect(controller.value.sparksRemaining, 3);
+    expect(controller.value.status, GameStatus.aiming);
+    expect(game.canUndo, isFalse);
+  });
+
+  testWidgets('restart clears progress back to the initial state', (
+    tester,
+  ) async {
+    final controller = GameSessionController(
+      levelId: 1,
+      initial: GameState.initial(sparks: 3, starsTotal: 1, parForThreeStars: 3),
+    );
+    final game = NovaGame(level: _oneStarLevel(), controller: controller);
+
+    await tester.pumpWidget(
+      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+    );
+    await _pumpUntilLoaded(tester, game);
+
+    const mid = PhysicsConstants.boardWidth / 2;
+    game
+      ..aimStart(Vector2(mid, 158))
+      ..aimUpdate(Vector2(mid, 230))
+      ..aimEnd();
+    for (var i = 0; i < 400 && !controller.value.isOver; i++) {
+      game.update(1 / 60);
+    }
+    expect(controller.value.status, GameStatus.won);
+
+    game.restartLevel();
+
+    expect(controller.value.status, GameStatus.aiming);
+    expect(controller.value.starsLit, 0);
+    expect(controller.value.sparksRemaining, 3);
+    expect(game.canUndo, isFalse);
   });
 }
