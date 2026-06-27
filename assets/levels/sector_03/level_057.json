@@ -1,0 +1,62 @@
+{
+  "id": 57,
+  "sector": 3,
+  "sparks": 6,
+  "parForThreeStars": 5,
+  "stars": [
+    {
+      "type": "star",
+      "x": 68.6,
+      "y": 62.9
+    },
+    {
+      "type": "star",
+      "x": 37.9,
+      "y": 64.5
+    },
+    {
+      "type": "star",
+      "x": 74.4,
+      "y": 89.9
+    },
+    {
+      "type": "star",
+      "x": 79.7,
+      "y": 22.1
+    },
+    {
+      "type": "star",
+      "x": 46.9,
+      "y": 75.6
+    }
+  ],
+  "elements": [
+    {
+      "type": "portal",
+      "x": 39.8,
+      "y": 49.5,
+      "params": {
+        "radius": 3,
+        "exitX": 86.8,
+        "exitY": 69.7
+      }
+    },
+    {
+      "type": "bumper",
+      "x": 59.8,
+      "y": 82.1,
+      "params": {
+        "w": 19
+      }
+    },
+    {
+      "type": "gravity_well",
+      "x": 86.5,
+      "y": 53.8,
+      "params": {
+        "radius": 22,
+        "strength": 692
+      }
+    }
+  ]
+}

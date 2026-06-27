@@ -1,0 +1,51 @@
+{
+  "id": 20,
+  "sector": 1,
+  "sparks": 5,
+  "parForThreeStars": 3,
+  "stars": [
+    {
+      "type": "star",
+      "x": 86.3,
+      "y": 87.3
+    },
+    {
+      "type": "star",
+      "x": 76.7,
+      "y": 74.3
+    },
+    {
+      "type": "star",
+      "x": 47.8,
+      "y": 75.2
+    }
+  ],
+  "elements": [
+    {
+      "type": "wall",
+      "x": 73.6,
+      "y": 41.2,
+      "params": {
+        "w": 20,
+        "h": 3
+      }
+    },
+    {
+      "type": "bumper",
+      "x": 20.8,
+      "y": 111.1,
+      "params": {
+        "w": 18
+      }
+    },
+    {
+      "type": "wall",
+      "x": 68.4,
+      "y": 99.5,
+      "params": {
+        "w": 27,
+        "h": 3
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": 3,
+  "sector": 1,
+  "sparks": 5,
+  "parForThreeStars": 2,
+  "stars": [
+    {
+      "type": "star",
+      "x": 77.4,
+      "y": 72.5
+    },
+    {
+      "type": "star",
+      "x": 21.4,
+      "y": 61.0
+    }
+  ],
+  "elements": [],
+  "introMechanic": "aim"
+}

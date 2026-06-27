@@ -1,0 +1,70 @@
+{
+  "id": 94,
+  "sector": 5,
+  "sparks": 7,
+  "parForThreeStars": 6,
+  "stars": [
+    {
+      "type": "star",
+      "x": 35.3,
+      "y": 50.7,
+      "params": {
+        "hits": 2
+      }
+    },
+    {
+      "type": "star",
+      "x": 25.7,
+      "y": 38.9
+    },
+    {
+      "type": "star",
+      "x": 85.6,
+      "y": 93.8
+    },
+    {
+      "type": "star",
+      "x": 76.6,
+      "y": 60.3
+    },
+    {
+      "type": "star",
+      "x": 66.4,
+      "y": 95.5
+    },
+    {
+      "type": "star",
+      "x": 56.9,
+      "y": 35.6
+    }
+  ],
+  "elements": [
+    {
+      "type": "wall",
+      "x": 56.1,
+      "y": 107.3,
+      "params": {
+        "w": 25,
+        "h": 3
+      }
+    },
+    {
+      "type": "gravity_well",
+      "x": 44.8,
+      "y": 82.4,
+      "params": {
+        "radius": 23,
+        "strength": 758
+      }
+    },
+    {
+      "type": "wall",
+      "x": 18.1,
+      "y": 63.9,
+      "params": {
+        "w": 25,
+        "h": 3
+      }
+    }
+  ]
+}

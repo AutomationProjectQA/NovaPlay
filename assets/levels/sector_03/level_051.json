@@ -1,0 +1,48 @@
+{
+  "id": 51,
+  "sector": 3,
+  "sparks": 6,
+  "parForThreeStars": 4,
+  "stars": [
+    {
+      "type": "star",
+      "x": 39.5,
+      "y": 96.5
+    },
+    {
+      "type": "star",
+      "x": 44.3,
+      "y": 31.1
+    },
+    {
+      "type": "star",
+      "x": 73.7,
+      "y": 48.3
+    },
+    {
+      "type": "star",
+      "x": 45.1,
+      "y": 52.4
+    }
+  ],
+  "elements": [
+    {
+      "type": "black_hole",
+      "x": 27.6,
+      "y": 85.0,
+      "params": {
+        "radius": 4
+      }
+    },
+    {
+      "type": "portal",
+      "x": 81.5,
+      "y": 70.4,
+      "params": {
+        "radius": 3,
+        "exitX": 83.4,
+        "exitY": 68.8
+      }
+    }
+  ]
+}

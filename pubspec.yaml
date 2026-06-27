@@ -81,6 +81,10 @@ flutter:
     - assets/translations/
     - assets/levels/
     - assets/levels/sector_01/
+    - assets/levels/sector_02/
+    - assets/levels/sector_03/
+    - assets/levels/sector_04/
+    - assets/levels/sector_05/
     - assets/images/
     - assets/audio/
 

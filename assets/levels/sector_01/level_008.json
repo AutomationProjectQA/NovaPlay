@@ -1,0 +1,38 @@
+{
+  "id": 8,
+  "sector": 1,
+  "sparks": 4,
+  "parForThreeStars": 2,
+  "stars": [
+    {
+      "type": "star",
+      "x": 75.4,
+      "y": 22.0
+    },
+    {
+      "type": "star",
+      "x": 41.9,
+      "y": 51.9
+    }
+  ],
+  "elements": [
+    {
+      "type": "wall",
+      "x": 65.5,
+      "y": 46.8,
+      "params": {
+        "w": 30,
+        "h": 3
+      }
+    },
+    {
+      "type": "wall",
+      "x": 62.1,
+      "y": 96.7,
+      "params": {
+        "w": 21,
+        "h": 3
+      }
+    }
+  ]
+}

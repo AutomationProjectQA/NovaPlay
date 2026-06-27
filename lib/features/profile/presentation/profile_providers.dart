@@ -1,16 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:novaplay/features/levels/presentation/levels_providers.dart';
 import 'package:novaplay/features/profile/domain/player_profile.dart';
+import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 
-/// The player's profile summary. Stubbed for Sprint 7; derived from real saved
-/// progress (XP, stars, streaks) in Sprints 10/14.
+/// The player's profile summary. Star totals are derived from saved progress;
+/// name/level/XP/streak remain stubbed until Sprint 14 wires the economy.
 final playerProfileProvider = Provider<PlayerProfile>((ref) {
-  return const PlayerProfile(
+  final totalStars = ref.watch(totalStarsProvider);
+  final highest = ref.watch(highestUnlockedLevelProvider);
+  final sectors = ref.watch(sectorsProvider);
+  final current = sectors.firstWhere(
+    (s) => highest >= s.firstLevel && highest <= s.lastLevel,
+    orElse: () => sectors.first,
+  );
+
+  return PlayerProfile(
     displayName: 'Stardrifter',
-    level: 7,
-    xpProgress: 0.6,
-    totalStars: 124,
-    starsThisSector: 41,
-    starsSectorTotal: 60,
-    bestStreak: 9,
+    level: 1 + totalStars ~/ 9,
+    xpProgress: (totalStars % 9) / 9,
+    totalStars: totalStars,
+    starsThisSector: current.starsEarned,
+    starsSectorTotal: current.starsTotal,
+    bestStreak: 0,
   );
 });

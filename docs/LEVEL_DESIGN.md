@@ -500,3 +500,23 @@ delivered via Firestore so they refresh without app updates (`CONCEPT.md` § 8).
 
 **Sign-off:** a level ships only when Design **and** QA both check off the above
 and the CI validator (§ 6) is green.
+
+---
+
+## Implementation note (Sprint 10)
+
+The 100 shipped level files (`assets/levels/sector_XX/level_XXX.json`) were
+produced by **`tool/generate_levels.dart`** — a deterministic generator that
+follows the sector schedule (§ 6.1) and the sawtooth difficulty curve (star
+count, spark slack, element budget, and mechanic palette per sector/phase).
+Regenerate with:
+
+```bash
+dart run tool/generate_levels.dart
+```
+
+These are an **on-curve baseline to be hand-tuned**, not a substitute for
+playtesting — each is validated for parse-correctness, in-bounds geometry, and
+spark budget by `test/levels_content_test.dart`. As Design hand-authors bespoke
+levels, individual JSON files are edited/replaced in place (the loader and
+manifest already key off these paths).

@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/progress/data/progress_repository.dart';
+import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 import 'package:novaplay/features/settings/domain/settings_state.dart';
 
 void main() {
@@ -27,15 +29,21 @@ void main() {
   });
 
   group('sectorsProvider', () {
-    test('exposes the five canonical sectors with the first two unlocked', () {
-      final container = ProviderContainer();
+    test('exposes five sectors; only sector 1 unlocked with no progress', () {
+      final container = ProviderContainer(
+        overrides: [
+          progressRepositoryProvider.overrideWithValue(
+            ProgressRepository(null),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
 
       final sectors = container.read(sectorsProvider);
       expect(sectors, hasLength(5));
       expect(sectors.first.name, 'Embers');
       expect(sectors.last.name, 'Singularity');
-      expect(sectors.where((s) => s.unlocked).length, 2);
+      expect(sectors.where((s) => s.unlocked).length, 1);
     });
   });
 

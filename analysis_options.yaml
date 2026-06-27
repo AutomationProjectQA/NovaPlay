@@ -10,6 +10,8 @@ analyzer:
     - "**/*.config.dart"
     - "**/firebase_options*.dart"
     - "lib/generated/**"
+    # One-off build/codegen scripts — not shipped in the app.
+    - "tool/**"
   errors:
     todo: ignore
   language:

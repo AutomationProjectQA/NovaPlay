@@ -6,10 +6,11 @@ import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/levels/domain/sector.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 
 /// The level grid for a single sector (docs/UI_GUIDELINES.md §3.3). A full-screen
-/// leaf pushed over the hub shell. Level node states (locked/next/cleared) are
-/// stubbed for Sprint 7; real per-level progress lands in Sprint 10.
+/// leaf pushed over the hub shell. Node states and stars come from saved
+/// progress.
 class LevelSelectScreen extends ConsumerWidget {
   const LevelSelectScreen({required this.sectorId, super.key});
 
@@ -22,7 +23,8 @@ class LevelSelectScreen extends ConsumerWidget {
       (s) => s.id == sectorId,
       orElse: () => sectors.first,
     );
-    final continueLevel = ref.watch(continueLevelProvider);
+    final highestUnlocked = ref.watch(highestUnlockedLevelProvider);
+    final progress = ref.watch(progressProvider);
 
     return NovaScaffold(
       appBar: AppBar(
@@ -49,12 +51,13 @@ class LevelSelectScreen extends ConsumerWidget {
         ),
         itemBuilder: (context, index) {
           final levelId = sector.firstLevel + index;
-          final state = _stateFor(levelId, continueLevel);
+          final stars = progress[levelId] ?? 0;
+          final state = _stateFor(levelId, highestUnlocked, stars);
           return LevelNode(
             levelId: levelId,
             state: state,
             sectorAccent: sector.accent,
-            stars: state == LevelNodeState.cleared ? _stubStars(levelId) : 0,
+            stars: stars,
             isFinale: levelId == sector.lastLevel,
             onTap: state == LevelNodeState.locked
                 ? null
@@ -65,13 +68,12 @@ class LevelSelectScreen extends ConsumerWidget {
     );
   }
 
-  LevelNodeState _stateFor(int levelId, int continueLevel) {
-    if (levelId < continueLevel) return LevelNodeState.cleared;
-    if (levelId == continueLevel) return LevelNodeState.next;
+  LevelNodeState _stateFor(int levelId, int highestUnlocked, int stars) {
+    if (stars > 0) return LevelNodeState.cleared;
+    if (levelId == highestUnlocked) return LevelNodeState.next;
+    if (levelId < highestUnlocked) return LevelNodeState.cleared;
     return LevelNodeState.locked;
   }
-
-  int _stubStars(int levelId) => (levelId % 3) + 1;
 }
 
 /// Convenience for building a labelled sector chip elsewhere if needed.

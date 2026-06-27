@@ -1,0 +1,39 @@
+{
+  "id": 59,
+  "sector": 3,
+  "sparks": 6,
+  "parForThreeStars": 4,
+  "stars": [
+    {
+      "type": "star",
+      "x": 77.8,
+      "y": 81.8
+    },
+    {
+      "type": "star",
+      "x": 19.5,
+      "y": 29.9
+    },
+    {
+      "type": "star",
+      "x": 49.1,
+      "y": 52.1
+    },
+    {
+      "type": "star",
+      "x": 22.6,
+      "y": 95.9
+    }
+  ],
+  "elements": [
+    {
+      "type": "gravity_well",
+      "x": 64.0,
+      "y": 68.3,
+      "params": {
+        "radius": 23,
+        "strength": 767
+      }
+    }
+  ]
+}

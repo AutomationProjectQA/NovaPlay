@@ -101,7 +101,9 @@ void main() {
     final game = NovaGame(level: level, controller: controller);
 
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+      MaterialApp(
+        home: Scaffold(body: GameWidget<NovaGame>(game: game)),
+      ),
     );
     await _pumpUntilLoaded(tester, game);
 
@@ -110,7 +112,11 @@ void main() {
       ..aimStart(Vector2(mid, 158))
       ..aimUpdate(Vector2(mid, 230))
       ..aimEnd();
-    for (var i = 0; i < 400 && controller.value.status != GameStatus.aiming; i++) {
+    for (
+      var i = 0;
+      i < 400 && controller.value.status != GameStatus.aiming;
+      i++
+    ) {
       game.update(1 / 60);
     }
 
@@ -136,7 +142,9 @@ void main() {
     final game = NovaGame(level: _oneStarLevel(), controller: controller);
 
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: GameWidget<NovaGame>(game: game))),
+      MaterialApp(
+        home: Scaffold(body: GameWidget<NovaGame>(game: game)),
+      ),
     );
     await _pumpUntilLoaded(tester, game);
 

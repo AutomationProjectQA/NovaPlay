@@ -1,0 +1,43 @@
+{
+  "id": 27,
+  "sector": 2,
+  "sparks": 5,
+  "parForThreeStars": 3,
+  "stars": [
+    {
+      "type": "star",
+      "x": 65.5,
+      "y": 50.3
+    },
+    {
+      "type": "star",
+      "x": 64.5,
+      "y": 25.8
+    },
+    {
+      "type": "star",
+      "x": 27.2,
+      "y": 71.0
+    }
+  ],
+  "elements": [
+    {
+      "type": "wall",
+      "x": 39.6,
+      "y": 46.6,
+      "params": {
+        "w": 28,
+        "h": 3
+      }
+    },
+    {
+      "type": "gravity_well",
+      "x": 32.8,
+      "y": 113.0,
+      "params": {
+        "radius": 18,
+        "strength": 540
+      }
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import 'package:novaplay/features/game/presentation/gameplay_hud.dart';
 import 'package:novaplay/features/game/presentation/tutorial_overlay.dart';
 import 'package:novaplay/features/levels/domain/level_definition.dart';
 import 'package:novaplay/features/levels/presentation/levels_providers.dart';
+import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
 import 'package:novaplay/game/nova_game.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
@@ -107,9 +108,13 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
   }
 
   void _onComplete(GameResult result) {
-    // Level finished: drop the resume snapshot. Persisting stars/coins to
-    // progress is wired in Sprint 10.
+    // Level finished: drop the resume snapshot and record best stars on a win.
     unawaited(ref.read(sessionRepositoryProvider).clear(widget.levelId));
+    if (result.won) {
+      ref
+          .read(progressProvider.notifier)
+          .recordResult(levelId: widget.levelId, stars: result.stars);
+    }
   }
 
   void _persistSnapshot() {

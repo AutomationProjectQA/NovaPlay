@@ -1,0 +1,60 @@
+{
+  "id": 53,
+  "sector": 3,
+  "sparks": 6,
+  "parForThreeStars": 5,
+  "stars": [
+    {
+      "type": "star",
+      "x": 51.0,
+      "y": 29.6
+    },
+    {
+      "type": "star",
+      "x": 87.0,
+      "y": 48.1
+    },
+    {
+      "type": "star",
+      "x": 78.2,
+      "y": 25.8
+    },
+    {
+      "type": "star",
+      "x": 47.5,
+      "y": 47.4
+    },
+    {
+      "type": "star",
+      "x": 67.7,
+      "y": 44.0
+    }
+  ],
+  "elements": [
+    {
+      "type": "wall",
+      "x": 69.7,
+      "y": 99.0,
+      "params": {
+        "w": 21,
+        "h": 3
+      }
+    },
+    {
+      "type": "black_hole",
+      "x": 31.3,
+      "y": 61.4,
+      "params": {
+        "radius": 5
+      }
+    },
+    {
+      "type": "black_hole",
+      "x": 19.0,
+      "y": 90.8,
+      "params": {
+        "radius": 5
+      }
+    }
+  ]
+}

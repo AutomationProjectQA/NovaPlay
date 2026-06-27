@@ -1,0 +1,54 @@
+{
+  "id": 38,
+  "sector": 2,
+  "sparks": 5,
+  "parForThreeStars": 4,
+  "stars": [
+    {
+      "type": "star",
+      "x": 55.0,
+      "y": 90.1
+    },
+    {
+      "type": "star",
+      "x": 46.8,
+      "y": 78.6
+    },
+    {
+      "type": "star",
+      "x": 26.0,
+      "y": 68.8
+    },
+    {
+      "type": "star",
+      "x": 29.3,
+      "y": 46.7
+    }
+  ],
+  "elements": [
+    {
+      "type": "bumper",
+      "x": 82.9,
+      "y": 53.4,
+      "params": {
+        "w": 17
+      }
+    },
+    {
+      "type": "bumper",
+      "x": 60.7,
+      "y": 76.7,
+      "params": {
+        "w": 16
+      }
+    },
+    {
+      "type": "bumper",
+      "x": 43.7,
+      "y": 57.0,
+      "params": {
+        "w": 18
+      }
+    }
+  ]
+}
