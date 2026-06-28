@@ -31,9 +31,13 @@ class CurrencyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (icon, color) = switch (kind) {
-      CurrencyKind.coin => (Icons.monetization_on, AppColors.coin),
-      CurrencyKind.stardust => (Icons.auto_awesome, AppColors.stardust),
+    final (icon, color, unit) = switch (kind) {
+      CurrencyKind.coin => (Icons.monetization_on, AppColors.coin, 'coins'),
+      CurrencyKind.stardust => (
+        Icons.auto_awesome,
+        AppColors.stardust,
+        'stardust',
+      ),
     };
 
     return Material(
@@ -47,23 +51,38 @@ class CurrencyBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: AppSpacing.xxs),
-            Text(
-              formatCount(amount),
-              style: const TextStyle(
-                color: AppColors.onHigh,
-                fontFeatures: [FontFeature.tabularFigures()],
+            // Reads as one label (e.g. "1,240 coins"); the icon is decorative.
+            Semantics(
+              label: '$amount $unit',
+              excludeSemantics: true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: color, size: 18),
+                  const SizedBox(width: AppSpacing.xxs),
+                  Text(
+                    formatCount(amount),
+                    style: const TextStyle(
+                      color: AppColors.onHigh,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
               ),
             ),
             if (onAdd != null) ...[
               const SizedBox(width: AppSpacing.xxs),
-              InkResponse(
-                onTap: onAdd,
-                child: const Icon(
-                  Icons.add_circle,
-                  size: 18,
-                  color: AppColors.nova500,
+              Semantics(
+                button: true,
+                label: 'Add $unit',
+                child: InkResponse(
+                  onTap: onAdd,
+                  radius: 22,
+                  child: const Icon(
+                    Icons.add_circle,
+                    size: 18,
+                    color: AppColors.nova500,
+                  ),
                 ),
               ),
             ],
@@ -94,43 +113,60 @@ class LivesPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFull = lives >= maxLives;
+    final label = isFull
+        ? '$lives of $maxLives lives, full'
+        : countdown != null
+        ? '$lives of $maxLives lives, next in ${_spoken(countdown!)}'
+        : '$lives of $maxLives lives';
     return Material(
       color: AppColors.surfaceOverlay,
       borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xxs,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.favorite,
-                color: isFull ? AppColors.error : AppColors.warn,
-                size: 18,
-              ),
-              const SizedBox(width: AppSpacing.xxs),
-              Text('$lives', style: const TextStyle(color: AppColors.onHigh)),
-              if (!isFull && countdown != null) ...[
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  _format(countdown!),
-                  style: const TextStyle(
-                    color: AppColors.onMedium,
-                    fontSize: 12,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
+      child: Semantics(
+        label: label,
+        button: onTap != null,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xxs,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.favorite,
+                  color: isFull ? AppColors.error : AppColors.warn,
+                  size: 18,
                 ),
+                const SizedBox(width: AppSpacing.xxs),
+                Text('$lives', style: const TextStyle(color: AppColors.onHigh)),
+                if (!isFull && countdown != null) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    _format(countdown!),
+                    style: const TextStyle(
+                      color: AppColors.onMedium,
+                      fontSize: 12,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  /// Screen-reader-friendly duration, e.g. "3 minutes 5 seconds".
+  String _spoken(Duration d) {
+    final m = d.inMinutes.remainder(60);
+    final s = d.inSeconds.remainder(60);
+    return '${m}m ${s}s';
   }
 
   String _format(Duration d) {

@@ -13,16 +13,20 @@ class StarTriad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filled = earned.clamp(0, 3);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < 3; i++)
-          Icon(
-            i < filled ? Icons.star : Icons.star_border,
-            size: size,
-            color: i < filled ? AppColors.starLit : AppColors.starDim,
-          ),
-      ],
+    return Semantics(
+      label: '$filled of 3 stars',
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < 3; i++)
+            Icon(
+              i < filled ? Icons.star : Icons.star_border,
+              size: size,
+              color: i < filled ? AppColors.starLit : AppColors.starDim,
+            ),
+        ],
+      ),
     );
   }
 }
@@ -36,19 +40,23 @@ class StarMeter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.star, color: AppColors.starLit, size: 18),
-        const SizedBox(width: AppSpacing.xxs),
-        Text(
-          '$earned/$total',
-          style: const TextStyle(
-            color: AppColors.onHigh,
-            fontFeatures: [FontFeature.tabularFigures()],
+    return Semantics(
+      label: '$earned of $total stars earned',
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star, color: AppColors.starLit, size: 18),
+          const SizedBox(width: AppSpacing.xxs),
+          Text(
+            '$earned/$total',
+            style: const TextStyle(
+              color: AppColors.onHigh,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

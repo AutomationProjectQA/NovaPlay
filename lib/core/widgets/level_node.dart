@@ -82,50 +82,66 @@ class _LevelNodeState extends State<LevelNode>
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final animate = _breath != null && !reduceMotion;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: isLocked ? null : widget.onTap,
-          child: AnimatedBuilder(
-            animation: _breath ?? const AlwaysStoppedAnimation(0),
-            builder: (context, _) {
-              final pulse = animate ? _breath!.value : 0.5;
-              final glowAlpha = 0.3 + 0.25 * pulse;
-              return Container(
-                width: diameter,
-                height: diameter,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: fill,
-                  border: Border.all(
-                    color: ringColor,
-                    width: widget.isFinale ? 3 : 2,
-                  ),
-                  boxShadow: glow
-                      ? [
-                          BoxShadow(
-                            color: widget.sectorAccent.withValues(
-                              alpha: glowAlpha,
+    return Semantics(
+      button: !isLocked,
+      enabled: !isLocked,
+      label: _semanticLabel(isLocked),
+      excludeSemantics: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: isLocked ? null : widget.onTap,
+            child: AnimatedBuilder(
+              animation: _breath ?? const AlwaysStoppedAnimation(0),
+              builder: (context, _) {
+                final pulse = animate ? _breath!.value : 0.5;
+                final glowAlpha = 0.3 + 0.25 * pulse;
+                return Container(
+                  width: diameter,
+                  height: diameter,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: fill,
+                    border: Border.all(
+                      color: ringColor,
+                      width: widget.isFinale ? 3 : 2,
+                    ),
+                    boxShadow: glow
+                        ? [
+                            BoxShadow(
+                              color: widget.sectorAccent.withValues(
+                                alpha: glowAlpha,
+                              ),
+                              blurRadius: 18,
+                              spreadRadius: 1,
                             ),
-                            blurRadius: 18,
-                            spreadRadius: 1,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Center(child: _label(isLocked)),
-              );
-            },
+                          ]
+                        : null,
+                  ),
+                  child: Center(child: _label(isLocked)),
+                );
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.xxs),
-        if (widget.state == LevelNodeState.cleared)
-          StarTriad(earned: widget.stars, size: 12)
-        else
-          const SizedBox(height: 12),
-      ],
+          const SizedBox(height: AppSpacing.xxs),
+          if (widget.state == LevelNodeState.cleared)
+            StarTriad(earned: widget.stars, size: 12)
+          else
+            const SizedBox(height: 12),
+        ],
+      ),
     );
+  }
+
+  /// Screen-reader description of the node's level, state, and stars.
+  String _semanticLabel(bool isLocked) {
+    final kind = widget.isFinale ? 'Finale level' : 'Level';
+    if (isLocked) return '$kind ${widget.levelId}, locked';
+    if (widget.state == LevelNodeState.cleared) {
+      return '$kind ${widget.levelId}, cleared, ${widget.stars} of 3 stars';
+    }
+    return '$kind ${widget.levelId}, play next';
   }
 
   Widget _label(bool isLocked) {

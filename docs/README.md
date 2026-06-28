@@ -28,7 +28,9 @@ spectacle. The v1.0 MVP ships sectors 1–3 (≥ 60 of 100 handcrafted levels). 
 | [`LEVEL_DESIGN.md`](./LEVEL_DESIGN.md) | Sectors, difficulty curve, level authoring & tooling | 10 |
 | [`MONETIZATION.md`](./MONETIZATION.md) | Economy, ads, IAP, currencies, pricing, targets | 13 / 16 |
 | [`ANALYTICS.md`](./ANALYTICS.md) | Event taxonomy, funnels, KPIs, dashboards | 17 |
+| [`PERFORMANCE.md`](./PERFORMANCE.md) | Perf budget, render/startup/battery/asset optimizations, profiling | 18 |
 | [`QA_PLAN.md`](./QA_PLAN.md) | Test strategy, cases, device matrix, beta plan | 19–20 |
+| [`QA_REPORT.md`](./QA_REPORT.md) | QA pass results: coverage, a11y audit, edge-case matrix, known issues | 19 |
 | [`RELEASE_PLAN.md`](./RELEASE_PLAN.md) | Store assets, release pipeline, launch & rollback | 21–22 |
 
 ## How to use these docs
