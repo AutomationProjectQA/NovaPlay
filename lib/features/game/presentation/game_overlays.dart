@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
@@ -118,14 +119,17 @@ class WinOverlay extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Constellation lit!', style: context.textTheme.headlineMedium),
+          Text('win_title'.tr(), style: context.textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.md),
           _StarPopRow(earned: stars, reducedMotion: reducedMotion),
           const SizedBox(height: AppSpacing.md),
-          Text('+$coins coins', style: context.textTheme.titleMedium),
+          Text(
+            'win_coins'.tr(args: ['$coins']),
+            style: context.textTheme.titleMedium,
+          ),
           const SizedBox(height: AppSpacing.lg),
           NovaButton(
-            label: 'Next',
+            label: 'common_next'.tr(),
             icon: Icons.arrow_forward,
             onPressed: onNext,
           ),
@@ -134,14 +138,14 @@ class WinOverlay extends StatelessWidget {
             children: [
               Expanded(
                 child: NovaButton(
-                  label: 'Replay',
+                  label: 'common_replay'.tr(),
                   variant: NovaButtonVariant.ghost,
                   onPressed: onReplay,
                 ),
               ),
               Expanded(
                 child: NovaButton(
-                  label: 'Map',
+                  label: 'common_map'.tr(),
                   variant: NovaButtonVariant.ghost,
                   onPressed: onMap,
                 ),
@@ -183,30 +187,34 @@ class LoseOverlay extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('So close.', style: context.textTheme.headlineMedium),
+          Text('lose_title'.tr(), style: context.textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            '$starsRemaining star${starsRemaining == 1 ? '' : 's'} still dim',
+            'lose_stars_dim'.plural(starsRemaining),
             style: context.textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.lg),
           if (extraSparkCount > 0) ...[
             NovaButton(
-              label: 'Use Extra Spark ($extraSparkCount)',
+              label: 'lose_use_extra_spark'.tr(args: ['$extraSparkCount']),
               icon: Icons.flash_on,
               onPressed: onExtraSpark,
             ),
             const SizedBox(height: AppSpacing.xs),
             NovaButton(
-              label: 'Retry',
+              label: 'common_retry'.tr(),
               variant: NovaButtonVariant.secondary,
               onPressed: onRetry,
             ),
           ] else
-            NovaButton(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
+            NovaButton(
+              label: 'common_retry'.tr(),
+              icon: Icons.refresh,
+              onPressed: onRetry,
+            ),
           const SizedBox(height: AppSpacing.xs),
           NovaButton(
-            label: 'Map',
+            label: 'common_map'.tr(),
             variant: NovaButtonVariant.ghost,
             onPressed: onMap,
           ),
@@ -238,22 +246,22 @@ class PauseOverlay extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Paused', style: context.textTheme.headlineMedium),
+          Text('pause_title'.tr(), style: context.textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.lg),
           NovaButton(
-            label: 'Resume',
+            label: 'common_resume'.tr(),
             icon: Icons.play_arrow,
             onPressed: onResume,
           ),
           const SizedBox(height: AppSpacing.xs),
           NovaButton(
-            label: 'Restart',
+            label: 'common_restart'.tr(),
             variant: NovaButtonVariant.secondary,
             onPressed: onRestart,
           ),
           const SizedBox(height: AppSpacing.xs),
           NovaButton(
-            label: 'Quit to map',
+            label: 'common_quit_map'.tr(),
             variant: NovaButtonVariant.ghost,
             onPressed: onQuit,
           ),

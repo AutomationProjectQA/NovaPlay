@@ -40,7 +40,9 @@ Future<void> bootstrap(AppEnvironment env) async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en')],
+      // English (LTR), Spanish (LTR), Arabic (RTL). easy_localization persists
+      // the player's choice and restores it on the next launch (saveLocale).
+      supportedLocales: const [Locale('en'), Locale('es'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: const ProviderScope(child: NovaApp()),

@@ -81,8 +81,8 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               _NavTile(
                 label: 'settings_language'.tr(),
-                trailing: 'English',
-                onTap: () => _pickLanguage(context),
+                trailing: 'lang_${context.locale.languageCode}'.tr(),
+                onTap: () => _pickLanguage(context, ref),
               ),
               _NavTile(
                 label: 'settings_account'.tr(),
@@ -135,7 +135,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _pickLanguage(BuildContext context) {
+  void _pickLanguage(BuildContext context, WidgetRef ref) {
+    const locales = [Locale('en'), Locale('es'), Locale('ar')];
     unawaited(
       showNovaSheet<void>(
         context,
@@ -144,11 +145,26 @@ class SettingsScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: const Text('English'),
-                trailing: const Icon(Icons.check, color: AppColors.nova500),
-                onTap: () => Navigator.of(context).pop(),
-              ),
+              for (final locale in locales)
+                ListTile(
+                  title: Text('lang_${locale.languageCode}'.tr()),
+                  trailing: context.locale == locale
+                      ? const Icon(Icons.check, color: AppColors.nova500)
+                      : null,
+                  onTap: () {
+                    // easy_localization persists the choice (saveLocale) and
+                    // rebuilds the app; mirror it into our settings state too.
+                    unawaited(context.setLocale(locale));
+                    ref
+                        .read(settingsProvider.notifier)
+                        .setLanguage(locale.languageCode);
+                    getIt<AnalyticsService>().logSettingsChanged(
+                      setting: 'language',
+                      value: locale.languageCode,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                ),
             ],
           ),
         ),
@@ -157,7 +173,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _todo(BuildContext context) {
-    showNovaSnackBar(context, message: 'Coming soon');
+    showNovaSnackBar(context, message: 'coming_soon'.tr());
   }
 }
 

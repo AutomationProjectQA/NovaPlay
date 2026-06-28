@@ -58,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
         const SizedBox(height: AppSpacing.md),
         NovaButton(
-          label: 'Leaderboard',
+          label: 'profile_leaderboard'.tr(),
           icon: Icons.leaderboard,
           variant: NovaButtonVariant.secondary,
           onPressed: () => context.push(Routes.leaderboard),
@@ -92,7 +92,7 @@ class _AchievementTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  state.achievement.label,
+                  'achievement_${state.achievement.id}'.tr(),
                   style: context.textTheme.bodyLarge,
                 ),
                 const SizedBox(height: AppSpacing.xxs),
@@ -104,7 +104,11 @@ class _AchievementTile extends StatelessWidget {
           if (state.claimed)
             const Icon(Icons.check_circle, color: AppColors.success)
           else if (state.canClaim)
-            NovaButton(label: 'Claim', expand: false, onPressed: onClaim),
+            NovaButton(
+              label: 'common_claim'.tr(),
+              expand: false,
+              onPressed: onClaim,
+            ),
         ],
       ),
     );

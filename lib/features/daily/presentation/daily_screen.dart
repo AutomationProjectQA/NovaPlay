@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:novaplay/app/router/route_names.dart';
@@ -38,7 +39,7 @@ class DailyScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        const _Header('Daily Challenge'),
+        _Header('daily_challenge'.tr()),
         NovaCard(
           accent: AppColors.sectorNebula,
           child: Row(
@@ -50,7 +51,7 @@ class DailyScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Level ${challenge.levelId}',
+                      'game_level'.tr(args: ['${challenge.levelId}']),
                       style: context.textTheme.titleMedium,
                     ),
                     Text(
@@ -64,7 +65,7 @@ class DailyScreen extends ConsumerWidget {
                 const Icon(Icons.check_circle, color: AppColors.success)
               else
                 NovaButton(
-                  label: 'Play',
+                  label: 'common_play'.tr(),
                   expand: false,
                   onPressed: () => launchLevelOrRefill(
                     context,
@@ -76,13 +77,13 @@ class DailyScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const _Header('Daily Reward'),
+        _Header('daily_reward'.tr()),
         NovaCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Streak: ${daily.streak} day${daily.streak == 1 ? '' : 's'}',
+                'daily_streak'.plural(daily.streak),
                 style: context.textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -96,8 +97,10 @@ class DailyScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               NovaButton(
                 label: daily.canClaim
-                    ? 'Claim day ${daily.claimDay} · ${daily.reward.summary}'
-                    : 'Claimed — come back tomorrow',
+                    ? 'daily_claim_day'.tr(
+                        args: ['${daily.claimDay}', daily.reward.summary],
+                      )
+                    : 'daily_claimed'.tr(),
                 icon: Icons.card_giftcard,
                 onPressed: daily.canClaim
                     ? () {
@@ -117,14 +120,16 @@ class DailyScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const _Header('Lucky Wheel & Chest'),
+        _Header('daily_wheel_chest'.tr()),
         Row(
           children: [
             Expanded(
               child: _OpenerCard(
                 icon: Icons.casino,
-                title: 'Lucky Wheel',
-                buttonLabel: wheelFree ? 'Spin' : 'Watch ad',
+                title: 'daily_lucky_wheel'.tr(),
+                buttonLabel: wheelFree
+                    ? 'daily_lucky_wheel_spin'.tr()
+                    : 'daily_lucky_wheel_ad'.tr(),
                 onPressed: () => _spinWheel(context, ref, free: wheelFree),
               ),
             ),
@@ -132,8 +137,10 @@ class DailyScreen extends ConsumerWidget {
             Expanded(
               child: _OpenerCard(
                 icon: Icons.inventory_2,
-                title: 'Mystery Chest',
-                buttonLabel: chestFree ? 'Open' : 'Tomorrow',
+                title: 'daily_mystery_chest'.tr(),
+                buttonLabel: chestFree
+                    ? 'daily_mystery_chest_open'.tr()
+                    : 'daily_mystery_chest_tomorrow'.tr(),
                 onPressed: chestFree
                     ? () => _claim(
                         context,
@@ -145,7 +152,7 @@ class DailyScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
-        const _Header('Daily Missions'),
+        _Header('daily_missions'.tr()),
         for (final state in missions)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -169,9 +176,9 @@ class DailyScreen extends ConsumerWidget {
       showNovaDialog<void>(
         context,
         dialog: NovaDialog(
-          title: 'Reward!',
+          title: 'daily_reward_dialog'.tr(),
           body: Text(reward.summary),
-          confirmLabel: 'Nice',
+          confirmLabel: 'common_nice'.tr(),
         ),
       ),
     );
@@ -288,7 +295,7 @@ class _MissionTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  state.mission.label,
+                  'mission_${state.mission.id}'.tr(),
                   style: context.textTheme.bodyLarge,
                 ),
               ),
@@ -296,7 +303,7 @@ class _MissionTile extends StatelessWidget {
                 const Icon(Icons.check_circle, color: AppColors.success)
               else if (state.canClaim)
                 NovaButton(
-                  label: 'Claim',
+                  label: 'common_claim'.tr(),
                   expand: false,
                   onPressed: onClaim,
                 )

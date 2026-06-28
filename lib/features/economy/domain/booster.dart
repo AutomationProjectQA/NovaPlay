@@ -13,4 +13,8 @@ extension BoosterInfo on BoosterType {
 
   /// Stable key for persistence.
   String get key => name;
+
+  /// Translation key for the display name (resolved with `.tr()` in the UI).
+  /// Kept here as a plain string so the domain stays free of l10n imports.
+  String get labelKey => 'booster_$name';
 }

@@ -82,9 +82,12 @@ class _EventBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(event.title, style: context.textTheme.titleMedium),
                 Text(
-                  event.description,
+                  'event_${event.id}_title'.tr(),
+                  style: context.textTheme.titleMedium,
+                ),
+                Text(
+                  'event_${event.id}_desc'.tr(),
                   style: context.textTheme.bodyMedium,
                 ),
               ],

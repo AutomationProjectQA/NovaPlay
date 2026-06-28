@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
@@ -19,10 +20,10 @@ class ErrorScreen extends StatelessWidget {
         child: SafeArea(
           child: NovaStateView(
             kind: NovaStateKind.error,
-            title: 'Lost in space',
-            message: message ?? "We couldn't find that screen.",
+            title: 'error_title'.tr(),
+            message: message ?? 'error_message'.tr(),
             icon: Icons.travel_explore,
-            actionLabel: 'Back to home',
+            actionLabel: 'error_back'.tr(),
             onAction: () => context.go(Routes.home),
           ),
         ),

@@ -31,7 +31,7 @@ class LevelSelectScreen extends ConsumerWidget {
         title: Text(sector.name),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.md),
+            padding: const EdgeInsetsDirectional.only(end: AppSpacing.md),
             child: Center(
               child: StarMeter(
                 earned: sector.starsEarned,

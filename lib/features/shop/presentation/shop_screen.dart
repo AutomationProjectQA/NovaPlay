@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
@@ -24,7 +25,7 @@ class ShopScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        const _SectionTitle('Boosters'),
+        _SectionTitle('shop_boosters'.tr()),
         for (final type in BoosterType.values)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -38,24 +39,29 @@ class ShopScreen extends ConsumerWidget {
                 final ok = ref.read(boostersProvider.notifier).buy(type);
                 showNovaSnackBar(
                   context,
-                  message: ok ? '${type.label} purchased' : 'Not enough coins',
+                  message: ok
+                      ? 'shop_purchased'.tr(args: [type.labelKey.tr()])
+                      : 'shop_not_enough_coins'.tr(),
                   status: ok ? NovaSnackStatus.success : NovaSnackStatus.error,
                 );
               },
             ),
           ),
         const SizedBox(height: AppSpacing.lg),
-        const _SectionTitle('Lives'),
+        _SectionTitle('shop_lives'.tr()),
         NovaCard(
           child: Row(
             children: [
               const Icon(Icons.favorite, color: AppColors.error),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text('Refill lives', style: context.textTheme.bodyLarge),
+                child: Text(
+                  'shop_refill_lives'.tr(),
+                  style: context.textTheme.bodyLarge,
+                ),
               ),
               NovaButton(
-                label: 'Refill',
+                label: 'common_refill'.tr(),
                 variant: NovaButtonVariant.secondary,
                 expand: false,
                 onPressed: () => unawaited(showLivesRefillSheet(context, ref)),
@@ -64,7 +70,7 @@ class ShopScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        const _SectionTitle('Convert'),
+        _SectionTitle('shop_convert'.tr()),
         NovaCard(
           child: Row(
             children: [
@@ -72,12 +78,14 @@ class ShopScreen extends ConsumerWidget {
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
-                  '1 stardust → ${EconomyConfig.stardustToCoinsRate} coins',
+                  'shop_convert_desc'.tr(
+                    args: ['${EconomyConfig.stardustToCoinsRate}'],
+                  ),
                   style: context.textTheme.bodyMedium,
                 ),
               ),
               NovaButton(
-                label: 'Convert',
+                label: 'common_convert'.tr(),
                 variant: NovaButtonVariant.secondary,
                 expand: false,
                 onPressed: wallet.stardust > 0

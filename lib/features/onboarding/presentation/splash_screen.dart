@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:novaplay/app/router/route_names.dart';
@@ -44,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Transform.scale(scale: 0.8 + 0.2 * t, child: child),
               );
             },
-            child: const Text('NovaPlay', style: AppTypography.displayLarge),
+            child: Text('app_title'.tr(), style: AppTypography.displayLarge),
           ),
         ),
       ),

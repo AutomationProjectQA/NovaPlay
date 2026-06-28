@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
@@ -16,7 +17,7 @@ class LeaderboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final entries = ref.watch(leaderboardProvider);
     return NovaScaffold(
-      appBar: AppBar(title: const Text('Leaderboard')),
+      appBar: AppBar(title: Text('leaderboard_title'.tr())),
       body: ListView.separated(
         padding: const EdgeInsets.all(AppSpacing.lg),
         itemCount: entries.length,

@@ -20,7 +20,8 @@ class HubTopBar extends ConsumerWidget {
     final lives = ref.watch(livesProvider);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
+      // Directional so the asymmetric start/end padding mirrors in RTL.
+      padding: const EdgeInsetsDirectional.fromSTEB(
         AppSpacing.sm,
         AppSpacing.xs,
         AppSpacing.md,

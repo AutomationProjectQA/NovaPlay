@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,7 @@ Future<void> showLivesRefillSheet(BuildContext context, WidgetRef ref) {
   return showNovaSheet<void>(
     context,
     sheet: NovaSheet(
-      title: 'Out of lives',
+      title: 'lives_out'.tr(),
       child: Consumer(
         builder: (context, ref, _) {
           final lives = ref.watch(livesProvider);
@@ -51,7 +52,7 @@ Future<void> showLivesRefillSheet(BuildContext context, WidgetRef ref) {
             } else {
               showNovaSnackBar(
                 context,
-                message: 'Not enough coins',
+                message: 'shop_not_enough_coins'.tr(),
                 status: NovaSnackStatus.error,
               );
             }
@@ -66,7 +67,7 @@ Future<void> showLivesRefillSheet(BuildContext context, WidgetRef ref) {
             } else {
               showNovaSnackBar(
                 context,
-                message: 'Not enough coins',
+                message: 'shop_not_enough_coins'.tr(),
                 status: NovaSnackStatus.error,
               );
             }
@@ -75,16 +76,20 @@ Future<void> showLivesRefillSheet(BuildContext context, WidgetRef ref) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${lives.current} / ${lives.max} lives'),
+              Text(
+                'lives_count'.tr(args: ['${lives.current}', '${lives.max}']),
+              ),
               const SizedBox(height: AppSpacing.md),
               NovaButton(
-                label: 'Watch ad — free life',
+                label: 'lives_watch_ad'.tr(),
                 icon: Icons.play_circle_outline,
                 onPressed: full ? null : () => unawaited(watchAd()),
               ),
               const SizedBox(height: AppSpacing.xs),
               NovaButton(
-                label: '${EconomyConfig.coinsPerLifeRefill} coins — 1 life',
+                label: 'lives_buy_one'.tr(
+                  args: ['${EconomyConfig.coinsPerLifeRefill}'],
+                ),
                 variant: NovaButtonVariant.secondary,
                 onPressed:
                     full || !wallet.canAfford(EconomyConfig.coinsPerLifeRefill)
@@ -93,7 +98,9 @@ Future<void> showLivesRefillSheet(BuildContext context, WidgetRef ref) {
               ),
               const SizedBox(height: AppSpacing.xs),
               NovaButton(
-                label: '${EconomyConfig.coinsFullLifeRefill} coins — full',
+                label: 'lives_buy_full'.tr(
+                  args: ['${EconomyConfig.coinsFullLifeRefill}'],
+                ),
                 variant: NovaButtonVariant.secondary,
                 onPressed:
                     full || !wallet.canAfford(EconomyConfig.coinsFullLifeRefill)
