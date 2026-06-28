@@ -35,10 +35,22 @@ by `AppEnvironment.instance.flavor`.
 
 ## 3. AdMob (Sprint 16)
 
-- Create an AdMob app + ad units (rewarded, interstitial) per platform.
-- Add the AdMob App ID to `AndroidManifest.xml` and `Info.plist`.
-- Replace `StubAdsService` with the `google_mobile_ads` implementation; keep
-  `useTestAds` (in `AppEnvironment`) true for dev/staging.
+AdMob is **fully integrated** with `google_mobile_ads`: `AdMobAdsService`
+(rewarded + interstitial, with consent hook) runs on mobile, while web/tests use
+`StubAdsService` (the mobile-only SDK is kept out of the web build via a
+conditional export). Interstitials are frequency-capped (`AdFrequency`, every
+Nth level, never mid-level, Remote Config-tunable). It ships with **Google's
+public TEST ad units + test App ID** — so it serves real test ads on a device
+**with no AdMob account**.
+
+To go to production:
+
+1. Create an AdMob app + ad units (rewarded, interstitial) per platform.
+2. Replace the test App IDs in `android/app/src/main/AndroidManifest.xml`
+   (`com.google.android.gms.ads.APPLICATION_ID`) and `ios/Runner/Info.plist`
+   (`GADApplicationIdentifier`).
+3. Replace the test unit IDs in `lib/core/services/ad_unit_ids.dart`.
+4. Implement the consent/UMP flow in `AdMobAdsService.init` and ATT on iOS.
 
 ## 4. In-App Purchases (Sprint 13)
 

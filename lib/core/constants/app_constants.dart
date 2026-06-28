@@ -23,6 +23,10 @@ abstract final class RcKeys {
   static const String maxLives = 'max_lives';
   static const String coinsPerLevel = 'coins_per_level';
   static const String featureLeaderboards = 'feature_leaderboards_enabled';
+
+  /// A/B test hooks (docs/MONETIZATION.md A/B testing).
+  static const String featureRewardedContinue = 'feature_rewarded_continue';
+  static const String adsExperimentVariant = 'ads_experiment_variant';
 }
 
 /// AdMob placement identifiers (docs/MONETIZATION.md ad strategy).

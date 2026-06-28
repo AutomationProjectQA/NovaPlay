@@ -9,10 +9,12 @@ import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/constants/audio_assets.dart';
 import 'package:novaplay/core/di/injector.dart';
+import 'package:novaplay/core/services/ads_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
+import 'package:novaplay/features/ads/presentation/ads_providers.dart';
 import 'package:novaplay/features/economy/domain/booster.dart';
 import 'package:novaplay/features/economy/domain/economy_config.dart';
 import 'package:novaplay/features/economy/presentation/economy_providers.dart';
@@ -193,6 +195,18 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     }
   }
 
+  /// Advances to the next level, showing a frequency-capped interstitial between
+  /// levels first (docs/MONETIZATION.md §2 — never mid-level).
+  Future<void> _nextLevel() async {
+    final showAd = ref
+        .read(interstitialControllerProvider.notifier)
+        .onLevelComplete(widget.levelId);
+    if (showAd) {
+      await getIt<AdsService>().maybeShowInterstitial();
+    }
+    await _navigateTo(Routes.gamePath(widget.levelId + 1));
+  }
+
   void _persistSnapshot() {
     if (_controller.value.isOver) return;
     final snapshot = GameSnapshot(
@@ -283,8 +297,7 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                   reducedMotion: reducedMotion,
                   extraSparkCount: extraSparks,
                   onExtraSpark: _useExtraSpark,
-                  onNext: () =>
-                      _navigateTo(Routes.gamePath(widget.levelId + 1)),
+                  onNext: () => unawaited(_nextLevel()),
                   onReplay: _restart,
                   onRetry: _restart,
                   onMap: () => context.go(Routes.home),

@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:novaplay/core/logging/app_logger.dart';
+import 'package:novaplay/core/services/ad_unit_ids.dart';
+import 'package:novaplay/core/services/ads_admob_service.dart';
 import 'package:novaplay/core/services/ads_service.dart';
 import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
@@ -19,7 +21,9 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<AppLogger>(AppLogger.new)
     ..registerLazySingleton<AnalyticsService>(NoopAnalyticsService.new)
     ..registerLazySingleton<RemoteConfigService>(StubRemoteConfigService.new)
-    ..registerLazySingleton<AdsService>(StubAdsService.new)
+    ..registerLazySingleton<AdsService>(
+      AdUnitIds.supported ? AdMobAdsService.new : StubAdsService.new,
+    )
     ..registerLazySingleton<AudioService>(FlameAudioService.new)
     ..registerLazySingleton<HapticsService>(PlatformHapticsService.new)
     ..registerLazySingleton<LeaderboardService>(LocalLeaderboardService.new)
