@@ -13,23 +13,21 @@ class HintComponent extends PositionComponent {
   /// The target to point at, or null to hide the hint.
   Vector2? target;
 
+  static final Paint _line = Paint()
+    ..color = AppColors.nova400.withValues(alpha: 0.5)
+    ..strokeWidth = 0.6
+    ..strokeCap = StrokeCap.round;
+  static final Paint _ring = Paint()
+    ..color = AppColors.nova500.withValues(alpha: 0.5)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 0.8;
+
   @override
   void render(Canvas canvas) {
     final to = target;
     if (to == null) return;
-    final paint = Paint()
-      ..color = AppColors.nova400.withValues(alpha: 0.5)
-      ..strokeWidth = 0.6
-      ..strokeCap = StrokeCap.round;
     canvas
-      ..drawLine(Offset(origin.x, origin.y), Offset(to.x, to.y), paint)
-      ..drawCircle(
-        Offset(to.x, to.y),
-        5,
-        Paint()
-          ..color = AppColors.nova500.withValues(alpha: 0.5)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.8,
-      );
+      ..drawLine(Offset(origin.x, origin.y), Offset(to.x, to.y), _line)
+      ..drawCircle(Offset(to.x, to.y), 5, _ring);
   }
 }

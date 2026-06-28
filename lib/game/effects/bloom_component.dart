@@ -12,6 +12,9 @@ class BloomComponent extends PositionComponent {
   static const double _duration = 0.8;
   double _elapsed = 0;
 
+  // Reused each frame (only its color/alpha changes).
+  final Paint _paint = Paint();
+
   @override
   void update(double dt) {
     _elapsed += dt;
@@ -22,11 +25,7 @@ class BloomComponent extends PositionComponent {
   void render(Canvas canvas) {
     final progress = (_elapsed / _duration).clamp(0.0, 1.0);
     final radius = 8 + progress * 130;
-    final alpha = (1 - progress) * 0.4;
-    canvas.drawCircle(
-      Offset.zero,
-      radius,
-      Paint()..color = AppColors.nova500.withValues(alpha: alpha),
-    );
+    _paint.color = AppColors.nova500.withValues(alpha: (1 - progress) * 0.4);
+    canvas.drawCircle(Offset.zero, radius, _paint);
   }
 }

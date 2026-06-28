@@ -20,6 +20,9 @@ class SparkComponent extends PositionComponent {
     ..color = AppColors.nova500.withValues(alpha: 0.35)
     ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
 
+  // Reused for every trail dot (recolored per point) to avoid per-frame allocs.
+  final Paint _trailPaint = Paint();
+
   /// Records the current position into the trail history.
   void pushTrail(Vector2 worldPosition) {
     _trail.addLast(worldPosition.clone());
@@ -39,10 +42,11 @@ class SparkComponent extends PositionComponent {
     for (final point in _trail) {
       final t = i / _trailLength;
       final local = point - position;
+      _trailPaint.color = AppColors.nova400.withValues(alpha: 0.08 + 0.20 * t);
       canvas.drawCircle(
         Offset(local.x, local.y),
         PhysicsConstants.sparkRadius * (0.3 + 0.7 * t),
-        Paint()..color = AppColors.nova400.withValues(alpha: 0.08 + 0.20 * t),
+        _trailPaint,
       );
       i++;
     }

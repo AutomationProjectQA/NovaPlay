@@ -40,37 +40,29 @@ class StarComponent extends PositionComponent {
     );
   }
 
+  // Cached paints — render runs every frame and must not allocate
+  // (docs/PERFORMANCE.md).
+  static final Paint _litGlow = Paint()
+    ..color = AppColors.nova500.withValues(alpha: 0.35)
+    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+  static final Paint _litBody = Paint()..color = AppColors.starLit;
+  static final Paint _dimFill = Paint()
+    ..color = AppColors.starDim.withValues(alpha: 0.4);
+  static final Paint _dimStroke = Paint()
+    ..color = AppColors.starDim
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 0.6;
+
   @override
   void render(Canvas canvas) {
     if (_lit) {
       canvas
-        ..drawCircle(
-          Offset.zero,
-          radius * 2,
-          Paint()
-            ..color = AppColors.nova500.withValues(alpha: 0.35)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
-        )
-        ..drawCircle(
-          Offset.zero,
-          radius,
-          Paint()..color = AppColors.starLit,
-        );
+        ..drawCircle(Offset.zero, radius * 2, _litGlow)
+        ..drawCircle(Offset.zero, radius, _litBody);
     } else {
       canvas
-        ..drawCircle(
-          Offset.zero,
-          radius,
-          Paint()..color = AppColors.starDim.withValues(alpha: 0.4),
-        )
-        ..drawCircle(
-          Offset.zero,
-          radius,
-          Paint()
-            ..color = AppColors.starDim
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 0.6,
-        );
+        ..drawCircle(Offset.zero, radius, _dimFill)
+        ..drawCircle(Offset.zero, radius, _dimStroke);
     }
   }
 }

@@ -14,14 +14,16 @@ class TrajectoryPreview extends PositionComponent {
   /// Clears the preview.
   void clear() => points = const [];
 
+  // Reused for every dot (recolored per point) — no per-frame allocation.
+  final Paint _paint = Paint();
+
   @override
   void render(Canvas canvas) {
     if (points.length < 2) return;
-    final paint = Paint()..color = AppColors.nova400.withValues(alpha: 0.6);
     for (var i = 0; i < points.length; i++) {
       final fade = 1 - i / points.length;
-      paint.color = AppColors.nova400.withValues(alpha: 0.5 * fade);
-      canvas.drawCircle(Offset(points[i].x, points[i].y), 0.7, paint);
+      _paint.color = AppColors.nova400.withValues(alpha: 0.5 * fade);
+      canvas.drawCircle(Offset(points[i].x, points[i].y), 0.7, _paint);
     }
   }
 }

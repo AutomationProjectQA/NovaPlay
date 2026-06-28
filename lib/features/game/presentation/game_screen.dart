@@ -304,7 +304,10 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
                     onPanUpdate: (d) =>
                         _game.aimUpdate(_toLogical(d.localPosition, w, h)),
                     onPanEnd: (_) => _game.aimEnd(),
-                    child: GameWidget<NovaGame>(game: _game),
+                    // Isolate the game's per-frame repaints from the HUD layer.
+                    child: RepaintBoundary(
+                      child: GameWidget<NovaGame>(game: _game),
+                    ),
                   );
                 },
               ),

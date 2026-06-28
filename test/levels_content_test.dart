@@ -55,6 +55,16 @@ void main() {
         );
       },
     );
+
+    // Guards the Sprint 18 asset-compression deliverable (docs/PERFORMANCE.md
+    // §6): the bundled JSON must stay minified, never pretty-printed.
+    test('level assets are minified (no pretty-print whitespace)', () {
+      final raw = File(
+        'assets/levels/sector_01/level_001.json',
+      ).readAsStringSync();
+      expect(raw.contains('\n'), isFalse, reason: 'level JSON is not minified');
+      expect(raw.contains(': '), isFalse, reason: 'level JSON is not minified');
+    });
   });
 }
 

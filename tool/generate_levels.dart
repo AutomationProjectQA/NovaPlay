@@ -42,9 +42,10 @@ void main() {
     final dir = Directory('assets/levels/sector_${_pad(sector, 2)}');
     dir.createSync(recursive: true);
     final path = '${dir.path}/level_${_pad(id, 3)}.json';
-    File(path).writeAsStringSync(
-      const JsonEncoder.withIndent('  ').convert(level),
-    );
+    // Compact (no whitespace) — these ship in the app bundle, so minify them to
+    // cut asset size and parse time (docs/PERFORMANCE.md). Edit via this tool,
+    // not by hand.
+    File(path).writeAsStringSync(jsonEncode(level));
     manifestLevels.add({'id': id, 'sector': sector, 'path': path});
   }
 
@@ -62,7 +63,7 @@ void main() {
     'levels': manifestLevels,
   };
   File('assets/levels/levels_manifest.json').writeAsStringSync(
-    const JsonEncoder.withIndent('  ').convert(manifest),
+    jsonEncode(manifest),
   );
 
   stdout.writeln('Generated 100 levels + manifest under assets/levels/.');

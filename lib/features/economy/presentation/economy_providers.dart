@@ -74,8 +74,21 @@ class LivesNotifier extends Notifier<Lives> {
   @override
   Lives build() {
     ref.onDispose(() => _timer?.cancel());
-    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _tick());
-    return _evaluate(persist: true);
+    final lives = _evaluate(persist: true);
+    _syncTimer(lives);
+    return lives;
+  }
+
+  /// The 1-second countdown only needs to run while lives are regenerating. At
+  /// the cap there is nothing to tick, so we stop the timer — saving wakeups and
+  /// battery (docs/PERFORMANCE.md). It restarts as soon as a life is spent.
+  void _syncTimer(Lives lives) {
+    if (lives.isFull) {
+      _timer?.cancel();
+      _timer = null;
+    } else {
+      _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+    }
   }
 
   Lives _evaluate({bool persist = false}) {
@@ -99,6 +112,7 @@ class LivesNotifier extends Notifier<Lives> {
   void _tick() {
     final next = _evaluate(persist: true);
     if (next != state) state = next;
+    _syncTimer(next);
   }
 
   /// Consumes a life on a failed attempt.
@@ -108,6 +122,7 @@ class LivesNotifier extends Notifier<Lives> {
     final anchor = state.isFull ? _nowMs : _repo.livesRegenMs;
     unawaited(_repo.setLives(newCount, anchor == 0 ? _nowMs : anchor));
     state = _evaluate();
+    _syncTimer(state);
   }
 
   /// Adds [count] lives (rewarded ad / coins), capped at max.
@@ -118,12 +133,14 @@ class LivesNotifier extends Notifier<Lives> {
         : (_repo.livesRegenMs == 0 ? _nowMs : _repo.livesRegenMs);
     unawaited(_repo.setLives(newCount, anchor));
     state = _evaluate();
+    _syncTimer(state);
   }
 
   /// Refills to the cap.
   void refillFull() {
     unawaited(_repo.setLives(EconomyConfig.maxLives, _nowMs));
     state = _evaluate();
+    _syncTimer(state);
   }
 }
 

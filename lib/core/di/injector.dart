@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get_it/get_it.dart';
 import 'package:novaplay/app/env/app_environment.dart';
 import 'package:novaplay/core/logging/app_logger.dart';
@@ -37,9 +39,37 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<NotificationService>(NoopNotificationService.new)
     ..registerLazySingleton<CrashReporter>(LoggingCrashReporter.new);
 
-  await getIt<CrashReporter>().init();
-  await getIt<RemoteConfigService>().init();
-  await getIt<AdsService>().init();
-  await getIt<AudioService>().init();
-  await getIt<NotificationService>().init();
+  // Critical path — these gate first-frame behaviour, so block on them, but run
+  // them together rather than one-after-another: the crash reporter must exist
+  // before the global error handlers, and Remote Config gates the A/B flags the
+  // first screen reads (docs/PERFORMANCE.md startup budget).
+  await Future.wait([
+    getIt<CrashReporter>().init(),
+    getIt<RemoteConfigService>().init(),
+  ]);
+
+  // Non-critical — the ad SDK, audio preload, and notification channels don't
+  // gate the first frame, so warm them up in the background to keep startup off
+  // their latency. Failures are reported, never fatal.
+  unawaited(_warmUpDeferredServices());
+}
+
+/// Initialises services that aren't needed for the first frame. Each is guarded
+/// independently so one slow/failing SDK can't block or cancel the others.
+Future<void> _warmUpDeferredServices() async {
+  final crash = getIt<CrashReporter>();
+  Future<void> guard(Future<void> Function() init) async {
+    try {
+      await init();
+    } on Object catch (error, stack) {
+      // A non-critical SDK failing to warm up must not crash startup; report it.
+      await crash.recordError(error, stack);
+    }
+  }
+
+  await Future.wait([
+    guard(getIt<AdsService>().init),
+    guard(getIt<AudioService>().init),
+    guard(getIt<NotificationService>().init),
+  ]);
 }
