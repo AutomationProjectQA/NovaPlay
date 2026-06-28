@@ -9,6 +9,8 @@ import 'package:novaplay/app/theme/nova_context.dart';
 import 'package:novaplay/core/constants/app_constants.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/ads_service.dart';
+import 'package:novaplay/core/services/analytics_events.dart';
+import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/economy/presentation/lives_refill_sheet.dart';
 import 'package:novaplay/features/live/domain/daily_challenge.dart';
@@ -98,10 +100,17 @@ class DailyScreen extends ConsumerWidget {
                     : 'Claimed — come back tomorrow',
                 icon: Icons.card_giftcard,
                 onPressed: daily.canClaim
-                    ? () => _claim(
-                        context,
-                        ref.read(dailyRewardProvider.notifier).claim(),
-                      )
+                    ? () {
+                        final reward = ref
+                            .read(dailyRewardProvider.notifier)
+                            .claim();
+                        if (reward != null) {
+                          getIt<AnalyticsService>().logDailyRewardClaimed(
+                            streakDay: daily.claimDay,
+                          );
+                        }
+                        _claim(context, reward);
+                      }
                     : null,
               ),
             ],

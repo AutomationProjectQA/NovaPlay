@@ -10,6 +10,8 @@ import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/core/constants/audio_assets.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/ads_service.dart';
+import 'package:novaplay/core/services/analytics_events.dart';
+import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
@@ -107,7 +109,14 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
       reducedMotion: ref.read(settingsProvider).reducedMotion,
       onSfx: _onSfx,
     );
+
+    getIt<AnalyticsService>().logLevelStart(
+      levelId: widget.levelId,
+      sectorId: _sectorId,
+    );
   }
+
+  int get _sectorId => ((widget.levelId - 1) ~/ 20) + 1;
 
   /// Routes a gameplay cue to audio + haptics.
   void _onSfx(GameSfx sfx) {
@@ -176,7 +185,24 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
       ref
           .read(dailyChallengeProvider.notifier)
           .completeIfMatches(widget.levelId);
+      getIt<AnalyticsService>()
+        ..logLevelComplete(
+          levelId: widget.levelId,
+          sectorId: _sectorId,
+          stars: result.stars,
+          sparksUsed: result.sparksUsed,
+        )
+        ..logCurrencyEarned(
+          currency: 'coins',
+          amount: _coinsAwarded,
+          source: 'level_win',
+        );
     } else {
+      getIt<AnalyticsService>().logLevelFail(
+        levelId: widget.levelId,
+        sectorId: _sectorId,
+        starsLit: _controller.value.starsLit,
+      );
       // A failed attempt consumes a life (docs/CONCEPT.md §7).
       ref.read(livesProvider.notifier).consume();
       if (ref.read(livesProvider).isEmpty) {

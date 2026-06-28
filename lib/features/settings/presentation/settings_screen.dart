@@ -9,6 +9,9 @@ import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/nova_context.dart';
+import 'package:novaplay/core/di/injector.dart';
+import 'package:novaplay/core/services/analytics_events.dart';
+import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
 
@@ -52,12 +55,24 @@ class SettingsScreen extends ConsumerWidget {
               _SwitchTile(
                 label: 'settings_haptics'.tr(),
                 value: settings.haptics,
-                onChanged: (v) => notifier.setHaptics(enabled: v),
+                onChanged: (v) {
+                  notifier.setHaptics(enabled: v);
+                  getIt<AnalyticsService>().logSettingsChanged(
+                    setting: 'haptics',
+                    value: v,
+                  );
+                },
               ),
               _SwitchTile(
                 label: 'settings_reduced_motion'.tr(),
                 value: settings.reducedMotion,
-                onChanged: (v) => notifier.setReducedMotion(enabled: v),
+                onChanged: (v) {
+                  notifier.setReducedMotion(enabled: v);
+                  getIt<AnalyticsService>().logSettingsChanged(
+                    setting: 'reduced_motion',
+                    value: v,
+                  );
+                },
               ),
             ],
           ),

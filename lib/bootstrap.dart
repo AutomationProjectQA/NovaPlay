@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +8,9 @@ import 'package:novaplay/app/app.dart';
 import 'package:novaplay/app/env/app_environment.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/persistence/hive_init.dart';
+import 'package:novaplay/core/services/analytics_events.dart';
+import 'package:novaplay/core/services/analytics_service.dart';
+import 'package:novaplay/core/services/crash_reporter.dart';
 
 /// Shared async startup used by every flavor entrypoint
 /// (`lib/main_<flavor>.dart`). Performs one-time init then mounts the app.
@@ -18,6 +24,19 @@ Future<void> bootstrap(AppEnvironment env) async {
   await EasyLocalization.ensureInitialized();
   await HiveInit.initialize();
   await configureDependencies();
+
+  // Route uncaught framework + platform errors to the crash reporter.
+  final crash = getIt<CrashReporter>();
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    unawaited(crash.recordError(details.exception, details.stack, fatal: true));
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    unawaited(crash.recordError(error, stack, fatal: true));
+    return true;
+  };
+
+  getIt<AnalyticsService>().logAppOpen();
 
   runApp(
     EasyLocalization(

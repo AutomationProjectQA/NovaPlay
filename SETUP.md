@@ -33,6 +33,18 @@ by `AppEnvironment.instance.flavor`.
 > These generated files and platform configs are **gitignored** (see below) —
 > each developer/CI provides their own.
 
+Once connected, swap the local service implementations in `core/di/injector.dart`:
+
+- **Analytics** → a `FirebaseAnalyticsService` (the typed event catalog in
+  `core/services/analytics_events.dart` already maps every event; just forward
+  `logEvent` to `FirebaseAnalytics.logEvent`). Today dev uses
+  `LoggingAnalyticsService` (console), prod uses `NoopAnalyticsService`.
+- **Crash reporting** → a `CrashlyticsCrashReporter` (the error handlers in
+  `bootstrap.dart` already route all uncaught errors to `CrashReporter`). Today
+  uses `LoggingCrashReporter`.
+- **Remote Config** → a `FirebaseRemoteConfigService` (drives ad cadence + A/B
+  flags; currently `StubRemoteConfigService` with shipped defaults).
+
 ## 3. AdMob (Sprint 16)
 
 AdMob is **fully integrated** with `google_mobile_ads`: `AdMobAdsService`

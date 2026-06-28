@@ -1,10 +1,12 @@
 import 'package:get_it/get_it.dart';
+import 'package:novaplay/app/env/app_environment.dart';
 import 'package:novaplay/core/logging/app_logger.dart';
 import 'package:novaplay/core/services/ad_unit_ids.dart';
 import 'package:novaplay/core/services/ads_admob_service.dart';
 import 'package:novaplay/core/services/ads_service.dart';
 import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
+import 'package:novaplay/core/services/crash_reporter.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/services/leaderboard_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
@@ -19,7 +21,12 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies() async {
   getIt
     ..registerLazySingleton<AppLogger>(AppLogger.new)
-    ..registerLazySingleton<AnalyticsService>(NoopAnalyticsService.new)
+    ..registerLazySingleton<AnalyticsService>(
+      // Observable in dev; no-op until Firebase Analytics is wired (SETUP.md).
+      AppEnvironment.instance.isProd
+          ? NoopAnalyticsService.new
+          : LoggingAnalyticsService.new,
+    )
     ..registerLazySingleton<RemoteConfigService>(StubRemoteConfigService.new)
     ..registerLazySingleton<AdsService>(
       AdUnitIds.supported ? AdMobAdsService.new : StubAdsService.new,
@@ -27,8 +34,10 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<AudioService>(FlameAudioService.new)
     ..registerLazySingleton<HapticsService>(PlatformHapticsService.new)
     ..registerLazySingleton<LeaderboardService>(LocalLeaderboardService.new)
-    ..registerLazySingleton<NotificationService>(NoopNotificationService.new);
+    ..registerLazySingleton<NotificationService>(NoopNotificationService.new)
+    ..registerLazySingleton<CrashReporter>(LoggingCrashReporter.new);
 
+  await getIt<CrashReporter>().init();
   await getIt<RemoteConfigService>().init();
   await getIt<AdsService>().init();
   await getIt<AudioService>().init();
