@@ -38,6 +38,7 @@ dependencies:
   easy_localization: ^3.0.8
   equatable: ^2.0.8
   in_app_review: ^2.0.9
+  url_launcher: ^6.3.1
   firebase_analytics: ^12.4.3
   firebase_auth: ^6.5.4
   firebase_core: ^4.11.0

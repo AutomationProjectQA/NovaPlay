@@ -1,0 +1,3 @@
+# Google Play service-account key path comes from CI secret PLAY_JSON_KEY_FILE.
+json_key_file(ENV["PLAY_JSON_KEY_FILE"] || "play-store-key.json")
+package_name("com.novaplay.novaplay")

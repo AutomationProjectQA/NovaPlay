@@ -1,0 +1,44 @@
+# NovaPlay — Android release lanes (docs/RELEASE_PLAN.md §4, §6).
+# Localized metadata is read from store/metadata/android (the source of truth).
+default_platform(:android)
+
+AAB = "../build/app/outputs/bundle/prodRelease/app-prod-release.aab"
+
+platform :android do
+  desc "Build the prod release App Bundle"
+  lane :build_aab do
+    sh("cd ../.. && flutter pub get && flutter build appbundle --flavor prod -t lib/main_prod.dart")
+  end
+
+  desc "Upload to the Play internal testing track (beta)"
+  lane :beta do
+    build_aab
+    upload_to_play_store(
+      track: "internal",
+      aab: AAB,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Promote to production with localized metadata + screenshots"
+  lane :release do
+    build_aab
+    upload_to_play_store(
+      track: "production",
+      aab: AAB,
+      metadata_path: "../../store/metadata/android",
+      rollout: "0.1", # staged rollout to 10% first (RELEASE_PLAN §7)
+    )
+  end
+
+  desc "Push localized store metadata only (no binary)"
+  lane :metadata do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      metadata_path: "../../store/metadata/android",
+    )
+  end
+end

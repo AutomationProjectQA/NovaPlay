@@ -1,0 +1,31 @@
+# NovaPlay — iOS release lanes (docs/RELEASE_PLAN.md §5, §6).
+# Auth via App Store Connect API key (CI secret APP_STORE_CONNECT_API_KEY).
+default_platform(:ios)
+
+IPA = "../build/ios/ipa/NovaPlay.ipa"
+
+platform :ios do
+  desc "Build the prod IPA"
+  lane :build_ipa do
+    sh("cd ../.. && flutter pub get && flutter build ipa --flavor prod -t lib/main_prod.dart --export-options-plist ios/ExportOptions.plist")
+  end
+
+  desc "Upload to TestFlight (beta)"
+  lane :beta do
+    build_ipa
+    upload_to_testflight(ipa: IPA, skip_waiting_for_build_processing: true)
+  end
+
+  desc "Submit to the App Store with localized metadata"
+  lane :release do
+    build_ipa
+    deliver(
+      ipa: IPA,
+      metadata_path: "../../store/metadata/ios",
+      screenshots_path: "../../store/screenshots/ios",
+      submit_for_review: false, # flip to true once assets are final
+      force: true,
+      precheck_include_in_app_purchases: false,
+    )
+  end
+end

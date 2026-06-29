@@ -16,6 +16,32 @@
 > (signed AAB + iOS verify + web); a smart in-app review prompt (`ReviewGate` +
 > `ReviewService`). Screenshot capture spec: [`store/screenshots/`](../store/screenshots).
 
+> **Implemented in Sprint 22:** fastlane release lanes in `android/fastlane/` &
+> `ios/fastlane/` (beta + release, reading `store/metadata/`; see
+> [`store/fastlane-README.md`](../store/fastlane-README.md)); hostable legal docs
+> [`docs/legal/PRIVACY_POLICY.md`](./legal/PRIVACY_POLICY.md) &
+> [`TERMS.md`](./legal/TERMS.md), linked from Settings (Privacy · Terms opens the
+> policy, "Rate NovaPlay" opens the store listing); `AppLinks` constants;
+> version-bump tool `tool/bump_version.dart` (+ `tool/version.dart`, tested); and
+> a root `CHANGELOG.md`.
+
+### Submission runbook (each release)
+
+1. `dart run tool/bump_version.dart [major|minor|patch|build]` — bumps pubspec.
+2. Update `CHANGELOG.md` and the localized `changelogs/`/`release_notes.txt` in
+   `store/metadata/`.
+3. `flutter analyze` · `flutter test` · `flutter build web` — all green.
+4. Commit, then tag `vX.Y.Z` → triggers `.github/workflows/release.yml`
+   (signed AAB + iOS verify + web).
+5. Beta: `cd android && bundle exec fastlane beta` (Play internal) and
+   `cd ios && bundle exec fastlane beta` (TestFlight). Soak per QA_PLAN.
+6. Capture/refresh screenshots (`store/screenshots/`), then push metadata:
+   `fastlane metadata` (Android) / handled by `deliver` (iOS).
+7. Production: `fastlane release` (Android starts at 10% staged rollout; iOS
+   uploads without auto-submit — submit for review from App Store Connect once
+   the privacy policy URL, content rating, and screenshots are final).
+8. Monitor (§7) and be ready to halt the rollout (§9).
+
 ---
 
 ## 1. Release Overview & Versioning

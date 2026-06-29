@@ -29,6 +29,19 @@ abstract final class RcKeys {
   static const String adsExperimentVariant = 'ads_experiment_variant';
 }
 
+/// Outbound links and contact info shown in Settings / store flows
+/// (docs/legal/, docs/RELEASE_PLAN.md). Replace the hosted URLs with the final
+/// published locations before store submission.
+abstract final class AppLinks {
+  static const String privacyPolicy = 'https://novaplay.app/privacy';
+  static const String terms = 'https://novaplay.app/terms';
+  static const String support = 'mailto:support@novaplay.app';
+
+  /// Store listing IDs used to deep-link the "Rate us" / store flows.
+  static const String androidPackageId = 'com.novaplay.novaplay';
+  static const String appStoreId = '000000000'; // TODO: real Apple app ID
+}
+
 /// AdMob placement identifiers (docs/MONETIZATION.md ad strategy).
 enum AdPlacement {
   rewardedExtraSpark,

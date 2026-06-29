@@ -9,11 +9,14 @@ import 'package:novaplay/app/router/route_names.dart';
 import 'package:novaplay/app/theme/app_colors.dart';
 import 'package:novaplay/app/theme/app_spacing.dart';
 import 'package:novaplay/app/theme/nova_context.dart';
+import 'package:novaplay/core/constants/app_constants.dart';
 import 'package:novaplay/core/di/injector.dart';
 import 'package:novaplay/core/services/analytics_events.dart';
 import 'package:novaplay/core/services/analytics_service.dart';
+import 'package:novaplay/core/services/review_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// App version label shown in the About section. Keep in sync with pubspec
 /// `version:` (wired to package_info in a later sprint).
@@ -95,12 +98,17 @@ class SettingsScreen extends ConsumerWidget {
             title: 'settings_about'.tr(),
             children: [
               _NavTile(
+                label: 'settings_rate'.tr(),
+                onTap: () =>
+                    unawaited(getIt<ReviewService>().openStoreListing()),
+              ),
+              _NavTile(
                 label: 'settings_restore'.tr(),
                 onTap: () => _todo(context),
               ),
               _NavTile(
                 label: 'settings_privacy'.tr(),
-                onTap: () => _todo(context),
+                onTap: () => _openUrl(AppLinks.privacyPolicy),
               ),
               _NavTile(
                 label: 'settings_reset_tutorial'.tr(),
@@ -174,6 +182,13 @@ class SettingsScreen extends ConsumerWidget {
 
   void _todo(BuildContext context) {
     showNovaSnackBar(context, message: 'coming_soon'.tr());
+  }
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
 
