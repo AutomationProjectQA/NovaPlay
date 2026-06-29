@@ -36,6 +36,7 @@ spectacle. The v1.0 MVP ships sectors 1–3 (≥ 60 of 100 handcrafted levels). 
 | [`PRIVACY.md`](./PRIVACY.md) | Data collection → Play Data Safety, App Store labels, privacy manifest | 21 |
 | [`RELEASE_PLAN.md`](./RELEASE_PLAN.md) | Store assets, release pipeline, launch & rollback | 21–22 |
 | [`LIVEOPS.md`](./LIVEOPS.md) | Post-launch: health monitoring, A/B experiments, kill switch, content cadence | 23 |
+| [`WEB_DEMO.md`](./WEB_DEMO.md) | Publish a public playable web build (GitHub Pages / Firebase / itch.io) | post-plan |
 | [`legal/`](./legal) | Hostable Privacy Policy & Terms of Service | 22 |
 
 ## How to use these docs

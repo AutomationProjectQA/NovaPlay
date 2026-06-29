@@ -69,6 +69,28 @@ class BlackHoleComponent extends PositionComponent {
   }
 }
 
+/// A round reflective asteroid (docs/CONCEPT.md §5). Moving asteroids reuse this
+/// — the game loop repositions it each frame.
+class AsteroidComponent extends PositionComponent {
+  AsteroidComponent({required Vector2 center, required this.radius})
+    : super(position: center, anchor: Anchor.center, priority: 20);
+
+  final double radius;
+
+  static final Paint _fill = Paint()..color = AppColors.onMedium;
+  static final Paint _rim = Paint()
+    ..color = AppColors.onHigh.withValues(alpha: 0.5)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 0.6;
+
+  @override
+  void render(Canvas canvas) {
+    canvas
+      ..drawCircle(Offset.zero, radius, _fill)
+      ..drawCircle(Offset.zero, radius, _rim);
+  }
+}
+
 /// A paired portal ring (entry or exit).
 class PortalComponent extends PositionComponent {
   PortalComponent({required Vector2 center, required this.radius})

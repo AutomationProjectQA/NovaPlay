@@ -181,7 +181,12 @@ List<String> _mechanicsFor(int sector, int idx) {
       ..add('black_hole')
       ..add('portal');
   }
-  if (sector >= 5) list.add('gravity_well'); // weight wells higher late-game
+  if (sector >= 4) list.add('asteroid'); // round reflective obstacles
+  if (sector >= 5) {
+    list
+      ..add('gravity_well') // weight wells higher late-game
+      ..add('moving_asteroid'); // drifting obstacles in the finale sector
+  }
   return list;
 }
 
@@ -218,6 +223,27 @@ Map<String, dynamic> _element(String type, Point<double> p, Random rng) {
           'radius': 3,
           'exitX': _round(12 + rng.nextDouble() * (boardWidth - 24)),
           'exitY': _round(30 + rng.nextDouble() * 40),
+        },
+      };
+    case 'asteroid':
+      return {
+        ...base,
+        'params': {'radius': 4 + rng.nextInt(3)},
+      };
+    case 'moving_asteroid':
+      // A drifting obstacle: same physics as 'asteroid' with a motion target.
+      final drift = 12.0 + rng.nextInt(12);
+      final dir = rng.nextBool() ? 1 : -1;
+      final toX = (p.x + dir * drift).clamp(10.0, boardWidth - 10);
+      return {
+        'type': 'asteroid',
+        'x': _round(p.x),
+        'y': _round(p.y),
+        'params': {
+          'radius': 4 + rng.nextInt(3),
+          'toX': _round(toX),
+          'toY': _round(p.y),
+          'period': _round(2.5 + rng.nextDouble() * 1.5),
         },
       };
     default:

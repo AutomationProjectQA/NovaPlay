@@ -1,5 +1,52 @@
+import 'dart:math' as math;
+
 import 'package:novaplay/game/physics/physics_constants.dart';
 import 'package:vector_math/vector_math.dart';
+
+/// Sinusoidal there-and-back motion for a moving collider (docs/GAME_DESIGN.md).
+/// A collider at `home` drifts toward [to] and back over [period] seconds, with
+/// an optional [phase] offset (0–1). Pure + deterministic — position is a closed
+/// function of time, so previews and replays match exactly.
+class ColliderMotion {
+  ColliderMotion({required this.to, required this.period, this.phase = 0});
+
+  final Vector2 to;
+  final double period;
+  final double phase;
+
+  /// The eased 0→1→0 position fraction at [time] seconds.
+  double fraction(double time) {
+    if (period <= 0) return 0;
+    return (math.sin(2 * math.pi * (time / period + phase)) + 1) / 2;
+  }
+
+  /// The interpolated position of a collider whose home is [home] at [time].
+  Vector2 positionAt(Vector2 home, double time) =>
+      home + (to - home) * fraction(time);
+}
+
+/// A round reflective obstacle — an asteroid (docs/CONCEPT.md §5). The spark
+/// bounces off its surface (circle reflection). When [motion] is set the asteroid
+/// drifts, becoming a moving obstacle. [bounce] is the energy multiplier on hit.
+class CircleCollider {
+  CircleCollider({
+    required this.home,
+    required this.radius,
+    this.bounce = 1.0,
+    this.motion,
+  });
+
+  final Vector2 home;
+  final double radius;
+  final double bounce;
+  final ColliderMotion? motion;
+
+  bool get isMoving => motion != null;
+
+  /// The asteroid's centre at [time] seconds (constant when static).
+  Vector2 centerAt(double time) =>
+      motion == null ? home : motion!.positionAt(home, time);
+}
 
 /// A reflective line segment — a wall edge, asteroid face, or bumper
 /// (docs/ARCHITECTURE.md §8.2). [bounce] is the energy multiplier on reflection

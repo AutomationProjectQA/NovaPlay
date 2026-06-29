@@ -47,6 +47,11 @@ class EconomyRepository {
   }
 
   Future<void> setBoosters(Map<String, int> value) => _put('boosters', value);
+
+  /// Non-consumable "remove ads" entitlement (docs/MONETIZATION.md IAP).
+  bool get removeAds => _getInt('remove_ads', 0) == 1;
+  Future<void> setRemoveAds({required bool value}) =>
+      _put('remove_ads', value ? 1 : 0);
 }
 
 /// Opens (or reuses) the economy box, opened at bootstrap.

@@ -16,6 +16,7 @@ import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/review_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
+import 'package:novaplay/features/shop/presentation/iap_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// App version label shown in the About section. Keep in sync with pubspec
@@ -104,7 +105,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               _NavTile(
                 label: 'settings_restore'.tr(),
-                onTap: () => _todo(context),
+                onTap: () => unawaited(_restore(context, ref)),
               ),
               _NavTile(
                 label: 'settings_privacy'.tr(),
@@ -189,6 +190,16 @@ class SettingsScreen extends ConsumerWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  Future<void> _restore(BuildContext context, WidgetRef ref) async {
+    final count = await ref.read(purchaseControllerProvider.notifier).restore();
+    if (!context.mounted) return;
+    showNovaSnackBar(
+      context,
+      message: count > 0 ? 'restore_done'.tr() : 'restore_none'.tr(),
+      status: count > 0 ? NovaSnackStatus.success : NovaSnackStatus.info,
+    );
   }
 }
 

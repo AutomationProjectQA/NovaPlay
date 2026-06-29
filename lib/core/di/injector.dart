@@ -10,6 +10,7 @@ import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/crash_reporter.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
+import 'package:novaplay/core/services/iap_service.dart';
 import 'package:novaplay/core/services/leaderboard_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
 import 'package:novaplay/core/services/remote_config_service.dart';
@@ -41,6 +42,9 @@ Future<void> configureDependencies() async {
       // Native review flow on mobile; no-op on web/desktop/tests.
       AdUnitIds.supported ? InAppReviewService.new : NoopReviewService.new,
     )
+    // Stub billing until store products are configured (SETUP.md); swap for the
+    // in_app_purchase-backed service in prod.
+    ..registerLazySingleton<IapService>(StubIapService.new)
     ..registerLazySingleton<NotificationService>(NoopNotificationService.new)
     ..registerLazySingleton<CrashReporter>(LoggingCrashReporter.new);
 

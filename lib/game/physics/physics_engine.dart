@@ -35,6 +35,7 @@ class PhysicsEngine {
     this.holes = const [],
     this.stars = const [],
     this.portals = const [],
+    this.circles = const [],
   });
 
   final List<SegmentCollider> segments;
@@ -43,14 +44,30 @@ class PhysicsEngine {
   final List<StarTarget> stars;
   final List<Portal> portals;
 
+  /// Round reflective obstacles (asteroids); may be moving (docs/GAME_DESIGN.md).
+  final List<CircleCollider> circles;
+
   static const double _eps = 1e-6;
+
+  /// Elapsed simulated time, advanced only by [step] (not by previews), so
+  /// moving colliders stay on a single deterministic timeline.
+  double _elapsed = 0;
+
+  /// The asteroid centre at [time], exposed so the Flame layer can move the
+  /// matching visual in lock-step with the simulation.
+  Vector2 circleCenterAt(int index, double time) =>
+      circles[index].centerAt(time);
+
+  /// Current simulated time (seconds since the engine was created).
+  double get elapsed => _elapsed;
 
   /// Advances [spark] by one fixed step, resolving collisions then triggers.
   StepEvents step(SparkBody spark, double dt) {
     final events = StepEvents();
     if (!spark.alive) return events;
 
-    events.bounced = _advance(spark, dt) > 0;
+    events.bounced = _advance(spark, dt, _elapsed) > 0;
+    _elapsed += dt;
     _resolveTriggers(spark, events);
     return events;
   }
@@ -58,7 +75,19 @@ class PhysicsEngine {
   /// Integration + collision only (no trigger side effects). Returns the number
   /// of bounces resolved. Shared by [step] and the trajectory preview so both
   /// behave identically.
-  int _advance(SparkBody spark, double dt) {
+  int _advance(SparkBody spark, double dt, double time) {
+    // Resolve moving-collider centres once for this step (movement per fixed
+    // step is sub-pixel, so treating them as static within the step is exact
+    // enough and keeps the swept solver simple).
+    final solids = [
+      for (final circle in circles)
+        (
+          c: circle.centerAt(time),
+          r: circle.radius,
+          bounce: circle.bounce,
+        ),
+    ];
+
     // Gravity wells: radial pull, stronger near the centre, zero past the radius.
     final accel = Vector2.zero();
     for (final well in wells) {
@@ -82,7 +111,7 @@ class PhysicsEngine {
     while (remaining > _eps && bounces <= PhysicsConstants.maxBouncesPerStep) {
       final p0 = spark.position.clone();
       final p1 = p0 + spark.velocity * remaining;
-      final hit = _nearestHit(p0, p1);
+      final hit = _nearestHit(p0, p1, spark.radius, solids);
       if (hit == null) {
         spark.position.setFrom(p1);
         break;
@@ -124,8 +153,14 @@ class PhysicsEngine {
     }
   }
 
-  /// Finds the nearest segment the path p0→p1 crosses, if any.
-  _Hit? _nearestHit(Vector2 p0, Vector2 p1) {
+  /// Finds the nearest collider the path p0→p1 crosses, if any — segments first,
+  /// then the round [solids] (asteroids), inflated by [sparkRadius].
+  _Hit? _nearestHit(
+    Vector2 p0,
+    Vector2 p1,
+    double sparkRadius,
+    List<({Vector2 c, double r, double bounce})> solids,
+  ) {
     final r = p1 - p0;
     _Hit? nearest;
     for (final seg in segments) {
@@ -140,6 +175,36 @@ class PhysicsEngine {
       var n = seg.normal;
       if (n.dot(r) > 0) n = -n; // face the incoming side
       nearest = _Hit(t: t, point: p0 + r * t, normal: n, bounce: seg.bounce);
+    }
+    // Swept point-vs-circle against each asteroid (inflated by the spark radius).
+    for (final solid in solids) {
+      final rSum = solid.r + sparkRadius;
+      final f = p0 - solid.c;
+      final inside = f.length2 - rSum * rSum;
+      double t;
+      Vector2 n;
+      if (inside < -_eps) {
+        // Already overlapping — bounce out immediately along the outward normal.
+        t = _eps;
+        n = f.length2 > _eps ? f.normalized() : Vector2(0, -1);
+      } else {
+        final a = r.dot(r);
+        if (a < _eps) continue; // not moving
+        final b = 2 * f.dot(r);
+        final disc = b * b - 4 * a * inside;
+        if (disc < 0) continue; // path misses the circle
+        t = (-b - math.sqrt(disc)) / (2 * a); // entry root
+        if (t < _eps || t > 1) continue;
+        n = (p0 + r * t - solid.c)..normalize();
+      }
+      if (nearest != null && t >= nearest.t) continue;
+      // Park on the asteroid surface; the caller adds another sparkRadius offset.
+      nearest = _Hit(
+        t: t,
+        point: solid.c + n * solid.r,
+        normal: n,
+        bounce: solid.bounce,
+      );
     }
     return nearest;
   }
@@ -162,8 +227,12 @@ class PhysicsEngine {
   }) {
     final ghost = start.clone();
     final points = <Vector2>[ghost.position.clone()];
+    // Advance a local clock so the preview reflects where moving asteroids will
+    // be, without touching the engine's real [_elapsed].
+    var time = _elapsed;
     for (var i = 0; i < maxSteps; i++) {
-      _advance(ghost, PhysicsConstants.fixedDt);
+      _advance(ghost, PhysicsConstants.fixedDt, time);
+      time += PhysicsConstants.fixedDt;
       if (i % sampleEvery == 0) points.add(ghost.position.clone());
       if (ghost.speed < PhysicsConstants.minSpeed) break;
       if (_inAnyBlackHole(ghost)) break;

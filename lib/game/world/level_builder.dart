@@ -14,8 +14,10 @@ class LevelField {
     required this.holes,
     required this.stars,
     required this.portals,
+    required this.circles,
     required this.visuals,
     required this.starComponents,
+    required this.asteroidComponents,
     required this.launchAnchor,
   });
 
@@ -24,6 +26,7 @@ class LevelField {
   final List<BlackHole> holes;
   final List<StarTarget> stars;
   final List<Portal> portals;
+  final List<CircleCollider> circles;
 
   /// Flame components to add to the world (walls, wells, holes, portals, stars).
   final List<Component> visuals;
@@ -31,6 +34,10 @@ class LevelField {
   /// Star visuals aligned 1:1 with [stars] by index, so the engine can light
   /// the matching component.
   final List<StarComponent> starComponents;
+
+  /// Asteroid visuals aligned 1:1 with [circles] by index, so moving asteroids
+  /// can be repositioned in lock-step with the simulation.
+  final List<AsteroidComponent> asteroidComponents;
 
   final Vector2 launchAnchor;
 }
@@ -42,8 +49,10 @@ LevelField buildLevelField(LevelDefinition level) {
   final holes = <BlackHole>[];
   final stars = <StarTarget>[];
   final portals = <Portal>[];
+  final circles = <CircleCollider>[];
   final visuals = <Component>[];
   final starComponents = <StarComponent>[];
+  final asteroidComponents = <AsteroidComponent>[];
 
   for (final s in level.stars) {
     final center = Vector2(s.x, s.y);
@@ -97,6 +106,28 @@ LevelField buildLevelField(LevelDefinition level) {
         visuals
           ..add(PortalComponent(center: center, radius: radius))
           ..add(PortalComponent(center: exit, radius: radius));
+      case 'asteroid':
+        final radius = _p(e.params, 'radius', 5);
+        // Optional sinusoidal motion → a moving obstacle.
+        final motion =
+            e.params.containsKey('toX') || e.params.containsKey('toY')
+            ? ColliderMotion(
+                to: Vector2(_p(e.params, 'toX', e.x), _p(e.params, 'toY', e.y)),
+                period: _p(e.params, 'period', 3),
+                phase: _p(e.params, 'phase', 0),
+              )
+            : null;
+        circles.add(
+          CircleCollider(
+            home: center,
+            radius: radius,
+            bounce: _p(e.params, 'bounce', 1),
+            motion: motion,
+          ),
+        );
+        final comp = AsteroidComponent(center: center, radius: radius);
+        asteroidComponents.add(comp);
+        visuals.add(comp);
     }
   }
 
@@ -111,8 +142,10 @@ LevelField buildLevelField(LevelDefinition level) {
     holes: holes,
     stars: stars,
     portals: portals,
+    circles: circles,
     visuals: visuals,
     starComponents: starComponents,
+    asteroidComponents: asteroidComponents,
     launchAnchor: anchor,
   );
 }

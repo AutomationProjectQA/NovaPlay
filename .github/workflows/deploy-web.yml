@@ -1,0 +1,58 @@
+name: Deploy Web Demo
+
+# Publishes a public playable build to GitHub Pages (docs/WEB_DEMO.md).
+# Uses the prod entrypoint so there's no debug banner or dev-only gallery; all
+# native services (ads/analytics/Firebase) fall back to web-safe stubs.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for the Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time; cancel superseded runs.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.44.4"
+
+jobs:
+  build:
+    name: Build web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # base-href must match the Pages sub-path (https://<user>.github.io/NovaPlay/).
+      # If you rename the repo or use a custom domain, update --base-href.
+      - name: Build
+        run: flutter build web --release -t lib/main_prod.dart --base-href "/NovaPlay/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

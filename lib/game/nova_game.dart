@@ -90,6 +90,7 @@ class NovaGame extends FlameGame {
       holes: _field.holes,
       stars: _field.stars,
       portals: _field.portals,
+      circles: _field.circles,
     );
 
     _spark = SparkBody(position: _anchor.clone());
@@ -297,9 +298,20 @@ class NovaGame extends FlameGame {
 
     _sparkComponent.position.setFrom(_spark.position);
     _sparkComponent.pushTrail(_spark.position);
+    _syncMovingAsteroids();
 
     _maybeShowVictoryBloom();
     if (_shotEnded) _finalizeShot();
+  }
+
+  /// Keeps moving-asteroid visuals locked to their simulated centres.
+  void _syncMovingAsteroids() {
+    for (var i = 0; i < _field.circles.length; i++) {
+      if (!_field.circles[i].isMoving) continue;
+      _field.asteroidComponents[i].position.setFrom(
+        _engine.circleCenterAt(i, _engine.elapsed),
+      );
+    }
   }
 
   /// Lights a star with its celebratory pop and particle burst.

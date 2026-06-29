@@ -64,10 +64,21 @@ To go to production:
 3. Replace the test unit IDs in `lib/core/services/ad_unit_ids.dart`.
 4. Implement the consent/UMP flow in `AdMobAdsService.init` and ATT on iOS.
 
-## 4. In-App Purchases (Sprint 13)
+## 4. In-App Purchases (Sprint 13 + post-plan)
 
-- Configure products in Google Play Console / App Store Connect to match the
-  catalog in [`docs/MONETIZATION.md`](docs/MONETIZATION.md).
+- The IAP architecture is wired: catalog in
+  [`lib/features/shop/domain/iap_catalog.dart`](lib/features/shop/domain/iap_catalog.dart)
+  (`coins_small`, `coins_large`, `starter_bundle`, `remove_ads`), an
+  `IapService` interface with a `StubIapService` (no real charge), the
+  `PurchaseController` grant flow, a Shop "Premium" section, and Settings →
+  Restore purchases. The `remove_ads` entitlement persists in the economy repo
+  and suppresses interstitials.
+- **To go live:** (1) create products in Google Play Console / App Store Connect
+  using the **same product ids** as the catalog; (2) add the `in_app_purchase`
+  plugin and implement a `StoreIapService` against it (query/buy/restore +
+  purchase-stream verification); (3) register it in DI in place of
+  `StubIapService` (mobile-only, like AdMob). Keep web/tests on the stub.
+- Balancing lives in [`docs/MONETIZATION.md`](docs/MONETIZATION.md).
 
 ## 5. App icon & splash (Sprint 5/11)
 

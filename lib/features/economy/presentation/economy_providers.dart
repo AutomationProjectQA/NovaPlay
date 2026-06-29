@@ -13,6 +13,27 @@ final economyRepositoryProvider = Provider<EconomyRepository>((ref) {
   return EconomyRepository(economyBox());
 });
 
+// ── Remove-ads entitlement (IAP) ──
+
+/// Whether the player owns the "remove ads" product. Persisted in the economy
+/// repo so it survives restarts (docs/MONETIZATION.md IAP).
+final removeAdsProvider = NotifierProvider<RemoveAdsNotifier, bool>(
+  RemoveAdsNotifier.new,
+);
+
+class RemoveAdsNotifier extends Notifier<bool> {
+  @override
+  bool build() => ref.read(economyRepositoryProvider).removeAds;
+
+  /// Grants the entitlement (after a successful purchase or restore).
+  void enable() {
+    unawaited(
+      ref.read(economyRepositoryProvider).setRemoveAds(value: true),
+    );
+    state = true;
+  }
+}
+
 // ── Wallet (coins + stardust) ──
 
 final walletProvider = NotifierProvider<WalletNotifier, Wallet>(
