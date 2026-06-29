@@ -13,6 +13,7 @@ import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/services/leaderboard_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
 import 'package:novaplay/core/services/remote_config_service.dart';
+import 'package:novaplay/core/services/review_service.dart';
 
 /// The global service locator.
 final GetIt getIt = GetIt.instance;
@@ -36,6 +37,10 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<AudioService>(FlameAudioService.new)
     ..registerLazySingleton<HapticsService>(PlatformHapticsService.new)
     ..registerLazySingleton<LeaderboardService>(LocalLeaderboardService.new)
+    ..registerLazySingleton<ReviewService>(
+      // Native review flow on mobile; no-op on web/desktop/tests.
+      AdUnitIds.supported ? InAppReviewService.new : NoopReviewService.new,
+    )
     ..registerLazySingleton<NotificationService>(NoopNotificationService.new)
     ..registerLazySingleton<CrashReporter>(LoggingCrashReporter.new);
 

@@ -15,6 +15,8 @@ import 'package:novaplay/core/services/analytics_service.dart';
 import 'package:novaplay/core/services/audio_service.dart';
 import 'package:novaplay/core/services/haptics_service.dart';
 import 'package:novaplay/core/services/notification_service.dart';
+import 'package:novaplay/core/services/review_gate.dart';
+import 'package:novaplay/core/services/review_service.dart';
 import 'package:novaplay/core/widgets/widgets.dart';
 import 'package:novaplay/features/ads/presentation/ads_providers.dart';
 import 'package:novaplay/features/economy/domain/booster.dart';
@@ -30,6 +32,7 @@ import 'package:novaplay/features/live/presentation/daily_challenge_provider.dar
 import 'package:novaplay/features/live/presentation/events_provider.dart';
 import 'package:novaplay/features/progress/presentation/progress_providers.dart';
 import 'package:novaplay/features/rewards/presentation/missions_providers.dart';
+import 'package:novaplay/features/rewards/presentation/rewards_providers.dart';
 import 'package:novaplay/features/settings/presentation/settings_providers.dart';
 import 'package:novaplay/game/nova_game.dart';
 import 'package:novaplay/game/physics/physics_constants.dart';
@@ -197,6 +200,8 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
           amount: _coinsAwarded,
           source: 'level_win',
         );
+      // A win is the right moment to (politely) ask for a store rating.
+      _maybeRequestReview();
     } else {
       getIt<AnalyticsService>().logLevelFail(
         levelId: widget.levelId,
@@ -219,6 +224,26 @@ class _GamePlayViewState extends ConsumerState<_GamePlayView>
     if (ref.read(boostersProvider.notifier).use(BoosterType.extraSpark)) {
       _game.continueWithExtraSpark();
     }
+  }
+
+  /// Asks the OS to surface the rating prompt at a winning moment, gated by
+  /// [ReviewGate] so an invested player is asked at most occasionally. The OS
+  /// has the final say and rate-limits the real dialog (docs/RELEASE_PLAN.md).
+  void _maybeRequestReview() {
+    final repo = ref.read(rewardsRepositoryProvider);
+    final cleared = ref
+        .read(progressProvider)
+        .values
+        .where((stars) => stars > 0)
+        .length;
+    final shouldAsk = ReviewGate.shouldRequestReview(
+      levelsCleared: cleared,
+      lastPromptLevel: repo.reviewLastPromptLevel,
+      alreadyReviewed: repo.reviewRequested,
+    );
+    if (!shouldAsk) return;
+    unawaited(repo.setReviewLastPromptLevel(cleared));
+    unawaited(getIt<ReviewService>().requestReview());
   }
 
   /// Advances to the next level, showing a frequency-capped interstitial between

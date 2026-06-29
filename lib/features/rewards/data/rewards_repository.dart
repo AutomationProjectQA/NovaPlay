@@ -60,6 +60,14 @@ class RewardsRepository {
   // Daily challenge (epoch-day it was last completed).
   int get challengeLastDay => _getInt('challenge_last_day');
   Future<void> setChallengeLastDay(int day) => _put('challenge_last_day', day);
+
+  // In-app review prompt (smart gating — docs/RELEASE_PLAN.md ASO).
+  bool get reviewRequested => _getInt('review_requested') == 1;
+  int get reviewLastPromptLevel => _getInt('review_last_prompt_level');
+  Future<void> setReviewRequested({required bool requested}) =>
+      _put('review_requested', requested ? 1 : 0);
+  Future<void> setReviewLastPromptLevel(int level) =>
+      _put('review_last_prompt_level', level);
 }
 
 /// Opens (or reuses) the rewards box, opened at bootstrap.

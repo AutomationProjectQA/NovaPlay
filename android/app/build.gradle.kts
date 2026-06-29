@@ -1,7 +1,21 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing is driven by android/key.properties (gitignored — see
+// key.properties.example and docs/RELEASE_PLAN.md §4). When the file is absent
+// (CI without secrets, fresh clones) the release build falls back to debug keys
+// so `flutter run --release` and `flutter build web` style flows still work.
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -46,12 +60,30 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseKeystore) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Replace with a real release signing config before store upload
-            // (docs/RELEASE_PLAN.md). Debug keys are used for now so
-            // `flutter run --release` works locally.
-            signingConfig = signingConfigs.getByName("debug")
+            // Use the real upload key when key.properties is present, else fall
+            // back to debug keys so local/CI release builds still succeed.
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+            // Code + resource shrinking are enabled here once a release keystore
+            // exists and ProGuard rules are verified on-device (RELEASE_PLAN §4).
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

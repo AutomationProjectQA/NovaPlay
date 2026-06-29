@@ -1,0 +1,14 @@
+# Android release signing — COPY to `key.properties` and fill in.
+# `key.properties` is gitignored; NEVER commit real keystore credentials.
+#
+# Generate an upload keystore (once):
+#   keytool -genkey -v -keystore ~/novaplay-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Then point storeFile at it (absolute path or relative to android/app).
+# In CI, write this file from encrypted secrets — see .github/workflows/release.yml.
+
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=upload
+storeFile=/absolute/path/to/novaplay-upload.jks

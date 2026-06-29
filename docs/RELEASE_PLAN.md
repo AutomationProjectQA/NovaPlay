@@ -6,6 +6,16 @@
 > Feeds from [`QA_PLAN.md`](./QA_PLAN.md) (beta exit) and points forward to
 > [`ROADMAP.md`](./ROADMAP.md).
 
+> **Implemented in Sprint 21:** localized store metadata in
+> [`store/metadata/`](../store/metadata) (en/es/ar, Play + App Store, fastlane
+> layout — rationale in [`STORE_LISTING.md`](./STORE_LISTING.md)); Android release
+> signing wired in `android/app/build.gradle.kts` via gitignored
+> `android/key.properties` (template: `android/key.properties.example`); iOS
+> privacy manifest `ios/Runner/PrivacyInfo.xcprivacy` + [`PRIVACY.md`](./PRIVACY.md)
+> (Data Safety / nutrition labels); release CI in `.github/workflows/release.yml`
+> (signed AAB + iOS verify + web); a smart in-app review prompt (`ReviewGate` +
+> `ReviewService`). Screenshot capture spec: [`store/screenshots/`](../store/screenshots).
+
 ---
 
 ## 1. Release Overview & Versioning
