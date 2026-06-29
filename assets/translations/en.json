@@ -88,6 +88,10 @@
   "error_message": "We couldn't find that screen.",
   "error_back": "Back to home",
 
+  "update_title": "Update required",
+  "update_body": "A new version of NovaPlay is needed to keep playing. Please update to continue.",
+  "update_button": "Update now",
+
   "profile_achievements": "Achievements",
   "profile_total_stars": "Total stars",
   "profile_sector_stars": "Sector stars",

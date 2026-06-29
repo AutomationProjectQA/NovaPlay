@@ -88,6 +88,10 @@
   "error_message": "No encontramos esa pantalla.",
   "error_back": "Volver al inicio",
 
+  "update_title": "Actualización necesaria",
+  "update_body": "Se necesita una nueva versión de NovaPlay para seguir jugando. Actualiza para continuar.",
+  "update_button": "Actualizar ahora",
+
   "profile_achievements": "Logros",
   "profile_total_stars": "Estrellas totales",
   "profile_sector_stars": "Estrellas del sector",

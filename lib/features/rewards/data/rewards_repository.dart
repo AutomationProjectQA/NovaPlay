@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:hive/hive.dart';
 import 'package:novaplay/core/constants/app_constants.dart';
 
@@ -60,6 +63,22 @@ class RewardsRepository {
   // Daily challenge (epoch-day it was last completed).
   int get challengeLastDay => _getInt('challenge_last_day');
   Future<void> setChallengeLastDay(int day) => _put('challenge_last_day', day);
+
+  // Stable per-install id for deterministic A/B bucketing (docs/LIVEOPS.md).
+  // Generated once, then persisted; cached in-session so concurrent callers
+  // before the async write lands still get the same id.
+  String? _installId;
+  String installId() {
+    if (_installId != null) return _installId!;
+    final existing = _get('install_id') as String?;
+    if (existing != null) return _installId = existing;
+    final id =
+        DateTime.now().microsecondsSinceEpoch.toRadixString(36) +
+        Random().nextInt(1 << 32).toRadixString(36);
+    _installId = id;
+    unawaited(_put('install_id', id));
+    return id;
+  }
 
   // In-app review prompt (smart gating — docs/RELEASE_PLAN.md ASO).
   bool get reviewRequested => _getInt('review_requested') == 1;

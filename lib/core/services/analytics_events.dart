@@ -23,6 +23,8 @@ abstract final class AnalyticsEvent {
   static const String dailyChallengePlayed = 'daily_challenge_played';
   static const String settingsChanged = 'settings_changed';
   static const String errorNonfatal = 'error_nonfatal';
+  static const String experimentExposure = 'experiment_exposure';
+  static const String appUpdatePrompt = 'app_update_prompt';
 }
 
 /// Shared parameter keys.
@@ -45,6 +47,9 @@ abstract final class AnalyticsParam {
   static const String result = 'result';
   static const String errorDomain = 'error_domain';
   static const String context = 'context';
+  static const String experiment = 'experiment';
+  static const String variant = 'variant';
+  static const String status = 'status';
 }
 
 /// Typed, taxonomy-safe wrappers over [AnalyticsService.logEvent]. Call these
@@ -150,6 +155,30 @@ extension NovaAnalytics on AnalyticsService {
         AnalyticsParam.errorDomain: domain,
         AnalyticsParam.context: context,
       },
+    );
+  }
+
+  /// Logs that a player was exposed to [variant] of an A/B [experiment]. Call
+  /// when the variant first affects behaviour (docs/LIVEOPS.md).
+  void logExperimentExposure({
+    required String experiment,
+    required String variant,
+  }) {
+    logEvent(
+      AnalyticsEvent.experimentExposure,
+      parameters: {
+        AnalyticsParam.experiment: experiment,
+        AnalyticsParam.variant: variant,
+      },
+    );
+  }
+
+  /// Logs that the forced-update / soft-nudge gate was shown ([status] =
+  /// `required` or `available`).
+  void logAppUpdatePrompt({required String status}) {
+    logEvent(
+      AnalyticsEvent.appUpdatePrompt,
+      parameters: {AnalyticsParam.status: status},
     );
   }
 }

@@ -88,6 +88,10 @@
   "error_message": "تعذّر العثور على تلك الشاشة.",
   "error_back": "العودة إلى الرئيسية",
 
+  "update_title": "التحديث مطلوب",
+  "update_body": "تحتاج إلى إصدار جديد من نوفا بلاي للمتابعة. يرجى التحديث للاستمرار.",
+  "update_button": "حدّث الآن",
+
   "profile_achievements": "الإنجازات",
   "profile_total_stars": "إجمالي النجوم",
   "profile_sector_stars": "نجوم القطاع",

@@ -2,7 +2,14 @@
 
 > Derived from [`CONCEPT.md`](./CONCEPT.md) (esp. §12 MVP scope). This roadmap sequences the
 > work; `PRD.md` owns exact acceptance criteria and `MONETIZATION.md` owns economy/ads detail.
-> Status: **Draft v1.0** · Owner: Product
+> Status: **v1.0 — 23-sprint plan COMPLETE (Sprints 0–23)** · Owner: Product
+
+> ✅ **All 23 sprints delivered.** The game is feature-complete, instrumented,
+> performance-tuned, QA'd, localized (en/es/ar + RTL), store-ready (signed builds,
+> ASO metadata, privacy compliance, fastlane), and operable post-launch (A/B
+> experiments, remote kill switch, LiveOps playbook — see [`LIVEOPS.md`](./LIVEOPS.md)).
+> Remaining work is external wiring (production Firebase/AdMob/IAP credentials,
+> hosted legal URLs) and the post-launch backlog (LIVEOPS §7).
 
 ---
 

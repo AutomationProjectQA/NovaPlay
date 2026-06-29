@@ -27,6 +27,23 @@ abstract final class RcKeys {
   /// A/B test hooks (docs/MONETIZATION.md A/B testing).
   static const String featureRewardedContinue = 'feature_rewarded_continue';
   static const String adsExperimentVariant = 'ads_experiment_variant';
+
+  /// LiveOps kill switch / forced update (docs/LIVEOPS.md). Builds below
+  /// [minSupportedBuild] are blocked; [latestBuild] drives an optional nudge.
+  static const String minSupportedBuild = 'min_supported_build';
+  static const String latestBuild = 'latest_build';
+
+  /// Per-experiment server override: `exp_<experimentKey>` → a variant id,
+  /// `control`, or `auto` (deterministic assignment). See docs/LIVEOPS.md.
+  static String experimentOverride(String experimentKey) =>
+      'exp_$experimentKey';
+}
+
+/// The running build number. Keep in sync with pubspec `version: X.Y.Z+build`
+/// (the `+build` part); wire to `package_info_plus` to read it at runtime later.
+/// Used by the forced-update gate (docs/LIVEOPS.md).
+abstract final class AppBuild {
+  static const int number = 1;
 }
 
 /// Outbound links and contact info shown in Settings / store flows

@@ -21,6 +21,8 @@ class StubRemoteConfigService implements RemoteConfigService {
     RcKeys.featureLeaderboards: false,
     RcKeys.featureRewardedContinue: true,
     RcKeys.adsExperimentVariant: 'control',
+    RcKeys.minSupportedBuild: 1,
+    RcKeys.latestBuild: 1,
   };
 
   @override
